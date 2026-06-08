@@ -49,9 +49,9 @@ Accounts are ranked on a Fit x Signal matrix (4 fit dimensions, 5 signal dimensi
 
 | Verdict | Criteria | Handling |
 |---------|----------|----------|
-| STRIKE | Fit ≥70, Signal ≥70 | Prep + stage, you review before send |
-| NURTURE | Fit ≥70, Signal <70 | Pre-trusted, one-tap enroll |
-| QUALIFY | Fit 40-69, Signal ≥40 | Pre-trusted, one-tap enroll |
+| STRIKE | Fit >=70, Signal >=70 | Prep + stage, you review before send |
+| NURTURE | Fit >=70, Signal <70 | Pre-trusted, one-tap enroll |
+| QUALIFY | Fit 40-69, Signal >=40 | Pre-trusted, one-tap enroll |
 | KILL | Either <40 | Never worked, off queue |
 
 ---
