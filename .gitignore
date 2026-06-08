@@ -1,0 +1,29 @@
+__MACOSX/
+.DS_Store
+*.pyc
+__pycache__/
+.env
+.venv/
+*.egg-info/
+.ipynb_checkpoints/
+*.swp
+*.swo
+*~
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# State & runs — per-user, machine-generated
+state/*
+runs/*
+!state/.gitkeep
+!runs/.gitkeep
+
+# Hopper — per-user
+hopper/hopper.jsonl
+hopper/rep_config.json
+hopper/Peter_Patch_FitSignal_Triage_*.xlsx
+
+# Build artifacts
+/dist
+/build

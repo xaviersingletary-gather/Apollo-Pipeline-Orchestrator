@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apollo Pipeline — Technical Process Map</title>
+<style>
+ body{margin:0;font-family:'Segoe UI',Calibri,Arial,sans-serif;background:#F4F6F8;color:#1A2B3C}
+ header{background:#0A2540;color:#fff;padding:22px 32px;border-left:10px solid #C9A227}
+ header h1{margin:0 0 4px;font-size:24px} header p{margin:0;color:#CADCFC;font-size:14px}
+ .wrap{padding:24px 32px;max-width:1400px;margin:0 auto}
+ .legend{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 8px}
+ .legend span{font-size:12px;padding:5px 12px;border-radius:14px;color:#fff;font-weight:600}
+ .diagram{background:#fff;border:1px solid #D9E0E6;border-radius:10px;padding:18px;overflow:auto}
+ h2{color:#0A2540;border-bottom:2px solid #C9A227;padding-bottom:6px;margin-top:34px;font-size:18px}
+ table{border-collapse:collapse;width:100%;background:#fff;font-size:13px}
+ th,td{border:1px solid #D9E0E6;padding:8px 10px;text-align:left;vertical-align:top}
+ th{background:#0A2540;color:#fff} tr:nth-child(even){background:#F4F6F8}
+ code{background:#0E2238;color:#D7E3EF;padding:1px 6px;border-radius:4px;font-size:12px}
+ .note{font-size:13px;color:#5B6B7B;font-style:italic;margin:8px 0}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,flowchart:{useMaxWidth:false,htmlLabels:true},securityLevel:'loose'});</script>
+</head><body>
+<header><h1>Self-Driving Apollo Pipeline — Technical Process Map</h1>
+<p>For IT / RevOps. Node IDs match TECHNICAL-SPEC.md. Colors = system of record.</p></header>
+<div class="wrap">
+<div class="legend">
+ <span style="background:#0A2540">Scheduler / Cowork</span>
+ <span style="background:#12365E">Claude orchestrator</span>
+ <span style="background:#17849E">Clay (sourcing/enrich)</span>
+ <span style="background:#1E7E34">Apollo (CRM/sequence)</span>
+ <span style="background:#B5651D">Operator (human)</span>
+ <span style="background:#C9A227;color:#0A2540">Decision / gate</span>
+ <span style="background:#C0392B">Failure path</span>
+</div>
+<p class="note">Tip: open in any browser. To edit, import <code>apollo-pipeline-flow.mmd</code> into Lucidchart (Import &gt; Mermaid), draw.io, or mermaid.live.</p>
+<div class="diagram"><pre class="mermaid">
+%% Self-Driving Apollo Pipeline - technical process map
+%% Import into Lucidchart: File > Import > Mermaid. Or paste into https://mermaid.live or draw.io.
+%% Node IDs (N0..N18) match TECHNICAL-SPEC.md.
+flowchart TD
+  classDef sys fill:#0A2540,stroke:#0A2540,color:#FFFFFF;
+  classDef claude fill:#12365E,stroke:#0A2540,color:#E6ECF5;
+  classDef clay fill:#17849E,stroke:#0E5A6E,color:#FFFFFF;
+  classDef apollo fill:#1E7E34,stroke:#155724,color:#FFFFFF;
+  classDef human fill:#B5651D,stroke:#8A4E16,color:#FFFFFF;
+  classDef gate fill:#C9A227,stroke:#9A7D1E,color:#0A2540;
+  classDef fail fill:#C0392B,stroke:#922B21,color:#FFFFFF;
+  classDef io fill:#F4F6F8,stroke:#5B6B7B,color:#1A2B3C;
+
+  N0["N0 Scheduler fires cron 3 7 * * 1-5<br/>spawns fresh Claude session"]:::sys
+  N1{"N1 gate.py next<br/>top todo account?"}:::gate
+  EMPTY["Slack: hopper empty<br/>(N15) - end"]:::sys
+  N2["N2 gate.py set in_progress<br/>(lock account)"]:::claude
+  N3["N3 Research<br/>fresh file under 14d? else run account-research"]:::claude
+  N4["N4 Clay find-and-enrich-contacts-at-company<br/>ICP titles + US"]:::clay
+  N5["N5 Filter to Director+ valid<br/>drop wrong-co / managers / noise"]:::claude
+  N6["N6 Clay add-contact-data-points (Email)<br/>+ get-task-context poll until complete"]:::clay
+  N6Q{"N6 valid verified-email<br/>contacts 20 or more?"}:::gate
+  RETRY{"sourcing passes < 3?"}:::gate
+  NEXTPAGE["N4b next page / broaden titles<br/>(pagination per_page up to 100)"]:::clay
+  ZERO["N15a Slack: ICP empty<br/>set todo, back to N1"]:::fail
+  SPILL["account exhausted under 20<br/>top up day from next account"]:::claude
+  N7["N7 Generate content per contact<br/>email + script + connect note (rep voice)"]:::claude
+  N8["N8 Write apollo-upload.csv<br/>+ apollo-import.csv"]:::io
+  N9["N9 Apollo contacts_search (dedupe)<br/>+ bulk_create -> capture ids"]:::apollo
+  N10{"N10 gate by quadrant"}:::gate
+  N11["N11 gate.py stage<br/>status=staged_for_approval"]:::claude
+  N12["N12 Write runs/[date]-[account]-run.md"]:::io
+  DAYQ{"day total 20+ or hopper dry?"}:::gate
+  N16["N16 Slack ONE morning report<br/>counts, gate, queue depth, confirm-enroll"]:::sys
+
+  N13["N13 OPERATOR replies enroll [account]<br/>(STRIKE after review / auto rubber-stamp)"]:::human
+  N13A["Apollo: campaigns_search + email_accounts_index<br/>+ add_contact_ids (status paused/active)"]:::apollo
+  N13B["gate.py enroll --mode apollo<br/>status=enrolled, write active-contacts.jsonl"]:::claude
+  N14["N14 OPERATOR import apollo-import.csv (Apollo UI)<br/>match on email -> fills custom fields, then activate"]:::human
+
+  N17["N17 Watcher (every 15m): Gmail search_threads<br/>+ get_thread for active contacts"]:::sys
+  N18{"N18 Classify reply"}:::gate
+  REAL["lead-scoring-and-handoff<br/>+ Slack score + doc"]:::apollo
+  SOFT["Slack rep: OOO / wrong-person<br/>needs guidance"]:::sys
+  LOG["append processed-replies.jsonl"]:::io
+
+  N0 --> N1
+  N1 -- empty --> EMPTY
+  N1 -- skip --> N1
+  N1 -- account --> N2 --> N3 --> N4 --> N5 --> N6 --> N6Q
+  N6Q -- no --> RETRY
+  RETRY -- yes --> NEXTPAGE --> N5
+  RETRY -- no, 0 found --> ZERO --> N1
+  RETRY -- no, partial found --> SPILL --> N7
+  N6Q -- yes --> N7
+  N7 --> N8 --> N9 --> N10
+  N10 -- STRIKE approve --> N11
+  N10 -- NURTURE/QUALIFY auto --> N11
+  N11 --> N12 --> DAYQ
+  DAYQ -- no, more todo --> N1
+  DAYQ -- yes --> N16
+  N16 -. operator reviews later .-> N13
+  N13 --> N13A --> N13B --> N14
+
+  N14 -. contacts now live, sending .-> N17
+  N17 --> N18
+  N18 -- real --> REAL --> LOG
+  N18 -- ooo/wrong-person --> SOFT --> LOG
+
+</pre></div>
+
+<h2>Sourcing retry loop (N4-N6, the part IT asked about)</h2>
+<p class="note">Plain English: Claude polls Clay for ICP contacts at the chosen account. It keeps only contacts with a verified email (phone optional, see toggle). If a pass returns fewer than 20 valid contacts, Clay is polled again with the next page / broadened titles, up to 3 passes total. If still short and the account is genuinely small, the day is topped up from the next hopper account; if zero are found, the account is parked and the run continues.</p>
+<table>
+<tr><th>Pass</th><th>Tool call</th><th>Validity gate</th><th>If &lt; 20 valid</th></tr>
+<tr><td>1</td><td><code>find-and-enrich-contacts-at-company</code> (ICP titles, US) then <code>add-contact-data-points</code> [Email] + <code>get-task-context</code> poll</td><td>verified email (and &ge;1 phone if <code>require_phone</code> on)</td><td>go to pass 2</td></tr>
+<tr><td>2</td><td>same, next page (per_page&le;100) / broadened title set</td><td>same</td><td>go to pass 3</td></tr>
+<tr><td>3</td><td>same, next page / broadened</td><td>same</td><td>exhausted: top up from next account, or park if 0 (F2)</td></tr>
+</table>
+
+<h2>Failure modes</h2>
+<table>
+<tr><th>ID</th><th>Condition</th><th>System behavior</th></tr>
+<tr><td>F1</td><td>Tool not pre-approved (no &quot;Run now&quot;)</td><td>Unattended session stalls on first tool call. One-time operator fix.</td></tr>
+<tr><td>F2</td><td>Clay returns 0 after 3 passes</td><td>Slack notice, <code>gate.py set &lt;account&gt; todo</code>, continue run. No crash.</td></tr>
+<tr><td>F3</td><td>Enrichment stuck in-progress</td><td>Bounded poll on <code>get-task-context</code>; drop unresolved contacts, proceed.</td></tr>
+<tr><td>F4</td><td>Apollo key lacks master scope</td><td>Per-contact fields can't be written by API; CSV import (N14) is the path.</td></tr>
+<tr><td>F5</td><td>Any step throws</td><td>Slack one-line failure, release lock (status->todo), write run log, exit clean.</td></tr>
+<tr><td>F6</td><td>Sequence missing/paused at enroll</td><td>Apollo error surfaced; no blind retry.</td></tr>
+</table>
+
+<h2>Safety invariants</h2>
+<table>
+<tr><th>#</th><th>Invariant</th></tr>
+<tr><td>1</td><td>Account locked (<code>in_progress</code>) before work, released on any exit.</td></tr>
+<tr><td>2</td><td>Unattended driver NEVER calls <code>add_contact_ids</code> or <code>approve</code>. Nothing sends without human confirm (N13) + activate (N14).</td></tr>
+<tr><td>3</td><td>All Apollo/Slack IDs come from a live in-session tool call; never fabricated.</td></tr>
+<tr><td>4</td><td><code>processed-replies.jsonl</code> + <code>active-contacts.jsonl</code> keep the 15-min watcher idempotent.</td></tr>
+</table>
+</div></body></html>

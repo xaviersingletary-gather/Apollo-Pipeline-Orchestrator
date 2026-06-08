@@ -1,0 +1,12 @@
+{
+  "rep_name": "<Your Full Name>",
+  "rep_email": "<you@gather.ai>",
+  "slack_user_id": "<Uxxxxxxxx — your Slack ID; ask Claude to find it with slack_search_users on your name>",
+  "apollo_sender_email_account_id": "<from apollo_email_accounts_index — your Gmail mailbox id>",
+  "apollo_sequence_id": "<your sequence id from apollo_emailer_campaigns_search>",
+  "apollo_sequence_name": "<your sequence name>",
+  "morning_cron": "3 7 * * 1-5",
+  "daily_contact_target": 20,
+  "icp_titles": ["VP/SVP Operations", "VP/SVP Supply Chain", "VP/SVP Logistics", "VP/SVP Distribution", "VP/SVP Fulfillment", "Director/Sr Director Operations", "Director/Sr Director Supply Chain", "Director/Sr Director Logistics", "Director/Sr Director Distribution", "Director DC Operations", "GM/Plant Manager (DC/warehouse)"],
+  "_note": "Copy this to rep_config.json and fill every <...>. Claude can discover the Slack/Apollo IDs for you during setup. apollo_config.json holds the shared Apollo wiring (custom fields, import spec); this file holds your identity only."
+}
