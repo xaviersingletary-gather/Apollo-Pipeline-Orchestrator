@@ -28,7 +28,7 @@ Run these in order. If a step has no useful output, log it and continue. Do not 
 
 ### Step 1 — Account research (pull or fresh)
 
-Check `OUTPUTS/[Account]/` for a research file less than 14 days old. If one exists, read it. If not, invoke the `account-research` skill on the account and wait for its output. Either way, the orchestrator needs the research file in hand before contact discovery.
+Check `$BASE/../[Account]/` for a research file less than 14 days old. If one exists, read it. If not, invoke the `account-research` skill on the account and wait for its output. Either way, the orchestrator needs the research file in hand before contact discovery.
 
 Read the research file. Extract:
 - Sub-org map (if the account has distinct divisions/business units)
@@ -91,7 +91,7 @@ Once selected, invoke `apollo:sequence-load` with:
 
 ### Step 5b — Log enrolled contacts to watcher state
 
-For every contact actually enrolled in the sequence (not duped out, not failed), append one line to `OUTPUTS/Apollo Pipeline Orchestrator/state/active-contacts.jsonl`:
+For every contact actually enrolled in the sequence (not duped out, not failed), append one line to `$BASE/state/active-contacts.jsonl`:
 
 ```
 {"email": "...", "first_name": "...", "last_name": "...", "company": "...", "sequence_id": "...", "enrolled_at": "ISO-8601"}
@@ -107,7 +107,7 @@ Output a one-screen summary to Peter:
 - Sequence name + ID they landed in
 - Any contacts skipped (with reason: missing email, dup, enrichment failed)
 - Step 4b status (ran for N contacts via `linkedin-video-dm`)
-- Where the orchestrator output log was saved: `OUTPUTS/Apollo Pipeline Orchestrator/runs/[YYYY-MM-DD]-[Account]-run.md`
+- Where the orchestrator output log was saved: `$BASE/runs/[YYYY-MM-DD]-[Account]-run.md`
 
 Then save that one-screen summary as the run log at the path above.
 

@@ -1,0 +1,36 @@
+{
+  "sequence_id": "<YOUR_SEQUENCE_ID>",
+  "sequence_name": "<Your Sequence Name>",
+  "sequence_url": "<OPTIONAL>",
+  "retired_sequence_id": "<OPTIONAL>",
+  "sender_email_account_id": "<YOUR_SENDER_MAILBOX_ID>",
+  "sender_email": "<you@gather.ai>",
+  "default_enroll_mode": "apollo",
+  "enroll_status_strike": "paused",
+  "enroll_status_auto": "active",
+  "verified_emails_only": true,
+  "daily_contact_target": 20,
+  "daily_target_model": "20 enriched contacts per day. DEFAULT: pull all 20 from the single top account. Large enterprise accounts have hundreds of Director+/VP Ops, Supply Chain, Logistics, Distribution, Fulfillment people, so 20 should come from ONE account on the first pass. Go DEEP before going wide: broaden the ICP title set and PAGINATE the Clay search (request multiple pages, per_page up to 100) until you have 20 Director+ ICP-qualified, US-based, verified-email contacts at that account. Only spill into the next hopper account if the current account is genuinely exhausted of qualified ICP contacts before reaching 20. Each account is gated/staged separately by its verdict (STRIKE -> approve, NURTURE/QUALIFY -> auto).",
+  "icp_titles": ["VP/SVP Operations", "VP/SVP Supply Chain", "VP/SVP Logistics", "VP/SVP Distribution", "VP/SVP Fulfillment", "Director/Sr Director Operations", "Director/Sr Director Supply Chain", "Director/Sr Director Logistics", "Director/Sr Director Distribution", "Director/Sr Director Fulfillment", "Director DC Operations", "GM/Plant Manager (DC/warehouse)"],
+  "sequence_cadence": [
+    "Day 1: manual email (bespoke first touch) + call + LinkedIn connection request",
+    "Day 3: call",
+    "Day 5: LinkedIn video",
+    "Day 7: email",
+    "Day 8: call"
+  ],
+  "personalization_model": "apollo_custom_fields",
+  "apollo_custom_fields": {
+    "Gather_Email_Subject": "day-1 email subject (template Subject = this merge var)",
+    "Gather_Email_Body": "day-1 bespoke email body (template Body = this merge var)",
+    "Gather_Script": "30-45s script, used in call step notes (day 1/3/8) and the day-5 LinkedIn video step",
+    "Gather_Connection_Note": "short LinkedIn connection-request note (<300 chars)"
+  },
+  "import_csv": {
+    "filename": "apollo-import.csv",
+    "match_key": "email",
+    "columns": ["email", "first_name", "last_name", "title", "company", "linkedin_url", "Gather_Email_Subject", "Gather_Email_Body", "Gather_Script", "Gather_Connection_Note"],
+    "how": "Each run writes apollo-import.csv next to apollo-upload.csv. Rep imports it in Apollo (Import -> match on email -> map Gather_* columns to the custom fields). One-time field/template setup is in hopper/APOLLO_SETUP.md."
+  },
+  "notes": "Apollo add_contact_ids requires explicit human confirmation and never auto-fires unattended. So the Driver PREPARES (research, source, enrich, content, create contacts in Apollo) and STAGES enrollment; the rep one-tap confirms the add-to-sequence. STRIKE enrolls paused for review; NURTURE/QUALIFY may enroll active (the day-1 manual email still gates the first send on the rep, so active never sprays touch 1)."
+}

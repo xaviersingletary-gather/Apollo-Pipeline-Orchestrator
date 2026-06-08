@@ -19,9 +19,10 @@ runs/*
 !state/.gitkeep
 !runs/.gitkeep
 
-# Hopper — per-user
+# Hopper — per-user generated runtime files
 hopper/hopper.jsonl
 hopper/rep_config.json
+hopper/apollo_config.json
 hopper/Peter_Patch_FitSignal_Triage_*.xlsx
 
 # Build artifacts

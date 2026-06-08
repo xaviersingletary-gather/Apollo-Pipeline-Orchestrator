@@ -1,6 +1,6 @@
 ---
 name: gather-apollo-response-watcher
-description: Background poller that watches Gmail every 15 minutes for replies from contacts enrolled in Apollo sequences by the gather-apollo-pipeline orchestrator. Classifies each reply as real / out-of-office / wrong-person. On real responses, auto-fires the lead-scoring-and-handoff skill, drops a branded handover .docx in OUTPUTS/Lead Workflow/, and Slack-DMs Peter with the lead score summary + doc link. On OOO or wrong-person replies, Slack-DMs Peter the reply text with a 'needs guidance' tag and does NOT auto-score. Use this skill when Peter says 'run the response watcher', 'check for Apollo responses', 'watch Gmail for replies', 'check who responded to my sequences', or any phrasing about polling for sequence replies. Also runs automatically via a scheduled task on a 15-minute interval. Do NOT use for sending outbound (use gather-apollo-pipeline), scoring leads outside the response context (use lead-scoring-and-handoff directly), or general inbox triage (use a Gmail tool directly).
+description: Background poller that watches Gmail every 15 minutes for replies from contacts enrolled in Apollo sequences by the gather-apollo-pipeline orchestrator. Classifies each reply as real / out-of-office / wrong-person. On real responses, auto-fires the lead-scoring-and-handoff skill, drops a branded handover .docx in $BASE/../Lead Workflow/, and Slack-DMs the rep with the lead score summary + doc link. On OOO or wrong-person replies, Slack-DMs the rep the reply text with a 'needs guidance' tag and does NOT auto-score. Use this skill when the rep says 'run the response watcher', 'check for Apollo responses', 'watch Gmail for replies', 'check who responded to my sequences', or any phrasing about polling for sequence replies. Also runs automatically via a scheduled task on a 15-minute interval. Do NOT use for sending outbound (use gather-apollo-pipeline), scoring leads outside the response context (use lead-scoring-and-handoff directly), or general inbox triage (use a Gmail tool directly).
 ---
 
 # Gather Apollo Response Watcher
@@ -11,13 +11,13 @@ Pull-side companion to `gather-apollo-pipeline`. Polls Gmail every 15 min for re
 
 Two trigger modes:
 - **Automatic:** a scheduled task fires this skill every 15 min.
-- **Manual:** Peter says "run the response watcher" or equivalent. Same execution path.
+- **Manual:** the rep says "run the response watcher" or equivalent. Same execution path.
 
 On first invocation, this skill registers the scheduled task if one does not already exist. Subsequent invocations skip registration.
 
 ## State files
 
-Two files in `OUTPUTS/Apollo Pipeline Orchestrator/state/`:
+Two files in `$BASE/state/`:
 
 - `active-contacts.jsonl` — appended by `gather-apollo-pipeline` every time a contact is enrolled in a sequence. One line per enrollment:
   ```
@@ -34,7 +34,7 @@ If either file does not exist, create it empty and continue. A missing state fil
 
 ### Step 1 — Self-register the scheduled task (first run only)
 
-Check `OUTPUTS/Apollo Pipeline Orchestrator/state/scheduler-registered.flag`. If it does not exist:
+Check `$BASE/state/scheduler-registered.flag`. If it does not exist:
 - Invoke `mcp__scheduled-tasks__create_scheduled_task` with a 15-minute recurring interval and the trigger `gather-apollo-response-watcher`.
 - Write the flag file with the task ID inside.
 - Continue.
@@ -76,8 +76,8 @@ If the message is genuinely ambiguous, default to **real** and let Peter sort it
 
 **For each real response:**
 1. Invoke `lead-scoring-and-handoff` with `lead_name` (first + last) and `company` from the contact record.
-2. Wait for it to produce the handover doc at `OUTPUTS/Lead Workflow/[First-Last]-[Company]-Handover.docx`.
-3. Slack DM Peter via `mcp__33da6e8a-ebd8-480b-b763-9cc7d3f6caa4__slack_send_message`. Format:
+2. Wait for it to produce the handover doc at `$BASE/../Lead Workflow/[First-Last]-[Company]-Handover.docx`.
+3. Slack DM the rep via `mcp__33da6e8a-ebd8-480b-b763-9cc7d3f6caa4__slack_send_message`. Format:
    ```
    🔔 Response from [First Last] at [Company]
    Quadrant: [STRIKE/NURTURE/QUALIFY/IGNORE]   Lead band: [80+/50-79/<50]
@@ -87,7 +87,7 @@ If the message is genuinely ambiguous, default to **real** and let Peter sort it
 
 **For each OOO response:**
 1. Do NOT invoke scoring.
-2. Slack DM Peter:
+2. Slack DM the rep:
    ```
    📭 OOO from [First Last] at [Company]
    Reply: "[first 200 chars]"
@@ -96,7 +96,7 @@ If the message is genuinely ambiguous, default to **real** and let Peter sort it
 
 **For each wrong-person response:**
 1. Do NOT invoke scoring.
-2. Slack DM Peter:
+2. Slack DM the rep:
    ```
    ❌ Wrong-person from [First Last] at [Company]
    Reply: "[first 200 chars]"
@@ -109,7 +109,7 @@ Append a new line to `processed-replies.jsonl` for every reply handled (regardle
 
 ### Step 7 — Exit cleanly
 
-No final Slack summary for the run itself. The per-response DMs are the output. Log to `OUTPUTS/Apollo Pipeline Orchestrator/runs/watcher-[YYYY-MM-DD-HHMM].log` with: contacts checked, replies found, classifications, actions taken.
+No final Slack summary for the run itself. The per-response DMs are the output. Log to `$BASE/runs/watcher-[YYYY-MM-DD-HHMM].log` with: contacts checked, replies found, classifications, actions taken.
 
 ## Tuning over time
 

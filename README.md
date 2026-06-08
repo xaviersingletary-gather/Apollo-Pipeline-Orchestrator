@@ -1,20 +1,24 @@
 # Apollo Pipeline Orchestrator
 
-Self-driving outbound pipeline for Gather AI sales reps. Every weekday morning the system pulls the top-scored account from a ranked hopper, sources 20 ICP contacts, enriches verified emails, writes personalized first-touch content per contact, stages them in Apollo, and reports back via Slack. The human rep only reviews and confirms send.
+Self-driving outbound pipeline for Gather AI sales reps. Every weekday morning the system pulls
+the top-scored account from a ranked hopper, sources 20 ICP contacts, enriches verified emails,
+writes personalized first-touch content per contact, stages them in Apollo, and reports back via
+Slack. The human rep only reviews and confirms send.
 
 ---
 
 ## About
 
-This project was built by Peter Tosh, Growth Engineer at Gather AI, to solve a specific problem: outbound prospecting was manual, repetitive, and required constant babysitting. Account selection, research, contact finding, and content writing all happened by hand, one account at a time, with no single view of what was worked, what landed, or what was next.
+This project codifies the entire outbound motion — scoring, sourcing, enrichment, content
+generation, staging, and response handling — into a portable toolkit. The philosophy: automate
+everything that does not require human judgment, gate everything that does. Nothing ships
+without an explicit confirm and activate. The rep stays the human on the calls, the LinkedIn
+videos, and the send button — the system handles the prep.
 
-The Apollo Pipeline Orchestrator turns outbound from a daily chore into a system that runs itself and asks for the rep only when it matters. It codifies the entire motion — scoring, sourcing, enrichment, content generation, staging, and response handling — into a reproducible, portable toolkit that any rep can stand up with one command.
+All scoring rules, voice rules, and cadence logic are in files, not in anyone's head. Clone the
+repo, run setup, fill your identity, and you are live.
 
-The design philosophy is explicit: automate everything that does not require human judgment, gate everything that does. High-value accounts (STRIKE) get a human review before anything sends. Volume accounts (NURTURE/QUALIFY) move fast with pre-trusted content. Nothing ships without an explicit confirm and activate. The rep stays the human on the calls, the LinkedIn videos, and the send button — the system handles the prep.
-
-All scoring rules, voice rules, and cadence logic are codified in files, not in anyone's head. The same engine runs on any account list. The hopper is just a ranked JSON file. Port the entire folder to another rep, run setup, and they are live.
-
-Built at Gather AI (warehouse drone automation), June 2026.
+Built by Peter Tosh at Gather AI, June 2026.
 
 ---
 
@@ -22,10 +26,39 @@ Built at Gather AI (warehouse drone automation), June 2026.
 
 | Phase | What Happens |
 |-------|-------------|
-| **Morning Driver (7am)** | Picks top account from scored hopper, researches, finds VP/Director+ contacts, enriches emails, writes bespoke email + call script + LinkedIn note per contact, stages in Apollo, Slack report |
-| **Operator Confirm** | Rep reviews staged account, confirms enroll, imports per-contact content via CSV, activates sequence |
-| **Response Watcher (15 min)** | Polls Gmail for replies from active contacts, classifies (real / OOO / wrong-person), auto-scores real replies and Slacks rep |
+| **Morning Driver (7am)** | Picks top account, researches, finds VP/Director+ contacts, enriches emails, writes bespoke email + call script + LinkedIn note per contact, stages in Apollo, Slack report |
+| **Operator Confirm** | Rep reviews, confirms enroll, imports `apollo-import.csv`, activates sequence |
+| **Response Watcher (15 min)** | Polls Gmail for replies, classifies (real / OOO / wrong-person), auto-scores real replies, Slacks rep |
 | **Weekly Digest** | Friday rollup of runs, enrollments, replies, hopper depth |
+
+---
+
+## Team Onboarding (one-liner)
+
+A teammate can start from scratch in 5 steps:
+
+```bash
+# 1. Clone
+git clone https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator.git
+cd Apollo-Pipeline-Orchestrator
+
+# 2. Scaffold
+python3 hopper/setup.py
+
+# 3. Ask Claude to fill identity
+# "Fill my rep_config.json. Find my Slack ID and Apollo mailbox/sequence IDs."
+# Then mirror those IDs into hopper/apollo_config.json.
+
+# 4. Build hopper
+# Create hopper/accounts.jsonl then:
+python3 hopper/build_hopper.py
+# Or ask Claude to score your accounts via account-scoring skill.
+
+# 5. Wire Apollo once (UI only — custom fields + sequence template), then:
+# Register scheduled tasks in Cowork + click Run now once.
+```
+
+Full written steps: `TEAM-SETUP.md`
 
 ---
 
@@ -78,13 +111,15 @@ Apollo Pipeline Orchestrator/
 │   ├── gate.py                      # Queue + gate logic (next, stage, enroll)
 │   ├── digest.py                    # Weekly rollup generator
 │   ├── build_hopper.py              # Fit x Signal scoring + hopper builder
-│   ├── setup.py                     # One-command workspace scaffold
-│   ├── MORNING_DRIVER.md            # The daily driver prompt (scheduled task)
+│   ├── setup.py                     # Scaffolds workspace + hydrates configs
+│   ├── MORNING_DRIVER.md            # Daily driver prompt template
 │   ├── GATE.md                      # Hybrid gate rules by quadrant
 │   ├── APOLLO_SETUP.md              # One-time Apollo custom-field wiring
-│   ├── apollo_config.json           # Shared Apollo wiring (sequence, fields)
-│   ├── rep_config.template.json     # Template for per-rep identity
-│   └── hopper.jsonl                 # Machine queue (generated per rep)
+│   ├── apollo_config.template.json  # Template for Apollo wiring
+│   ├── rep_config.template.json     # Template for rep identity
+│   ├── apollo_config.json           # YOUR Apollo config (generated from template)
+│   ├── rep_config.json              # YOUR identity (generated from template)
+│   └── hopper.jsonl                 # YOUR ranked account queue
 │
 ├── state/                           # Runtime state (response watcher)
 │   ├── active-contacts.jsonl        # Contacts enrolled in sequences
@@ -94,37 +129,15 @@ Apollo Pipeline Orchestrator/
 ├── runs/                            # Per-run audit logs
 │   └── YYYY-MM-DD-<Account>-run.md
 │
-├── apollo-onboard-skill/            # "run apollo setup" skill
-│   └── SKILL.md
-│
-├── gather-apollo-pipeline-skill/    # Morning driver skill
-│   └── SKILL.md
-│
-├── gather-apollo-response-watcher-skill/  # Reply watcher skill
-│   ├── SKILL.md
-│   └── references/classifier-patterns.md
-│
-├── gather-apollo-pipeline.skill     # Packaged pipeline skill
-├── gather-apollo-response-watcher.skill   # Packaged watcher skill
+├── apollo-onboard-skill/            # Skill: "run apollo setup"
+├── gather-apollo-pipeline-skill/    # Skill: morning driver
+├── gather-apollo-response-watcher-skill/  # Skill: reply watcher
 ├── build_deck.py                    # Team setup deck generator
-├── Apollo-Pipeline-Team-Setup-Guide.pptx   # Setup deck
-├── Apollo-System-Presentation-Brief.md   # Slide-by-slide deck brief
-├── TEAM-SETUP.md                    # Written setup instructions
+├── TEAM-SETUP.md                    # Full setup instructions
 ├── TECHNICAL-SPEC.md                # Node-by-node process spec
 ├── TRACKER.md                       # Build tracker / component status
 └── README.md                        # This file
 ```
-
----
-
-## Quick Start
-
-1. Install the onboard skill: copy `apollo-onboard-skill/` into your Cowork skill directory.
-2. Type: `run apollo setup`
-3. Follow the prompts (paste accounts, create Apollo custom fields, click "Run now" once).
-4. The 7am driver works your patch from there.
-
-Full written steps: see `TEAM-SETUP.md`
 
 ---
 
@@ -150,9 +163,10 @@ Full written steps: see `TEAM-SETUP.md`
 
 ## Status
 
-- 11 accounts scored (3 STRIKE, 6 NURTURE, 2 QUALIFY)
+- 11+ accounts scored across patches
 - DHL end-to-end run completed (6 contacts sourced, enriched, written, loaded)
 - Daily driver + weekly digest live and scheduled
 - Response watcher packaged, awaiting first dry-run
+- Repo cleaned for team cloning — no PII or machine-specific paths committed
 
-Built by Peter Tosh at Gather AI. Port to any rep's patch by copying the folder and running setup.
+Port to any rep's patch by cloning, running setup, and filling identity.

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build the team setup how-to deck (python-pptx). One-command 'run apollo setup' workflow."""
+"""Build the team setup how-to deck (python-pptx).
+
+Usage:
+  python3 build_deck.py                      # saves to current dir
+  python3 build_deck.py --out /path/to/file.pptx
+"""
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
@@ -224,6 +229,12 @@ txt(s,"You're live.",0.9,2.3,11,1.1,size=46,color=WHITE,bold=True,font=HFONT)
 txt(s,"Install the skill, type \"run apollo setup\", answer two prompts, do two clicks in Apollo. The 7am driver works your patch from there.",0.9,3.6,10.8,1.1,size=16,color="CADCFC",font=BFONT,line_sp=1.2)
 txt(s,"Full written steps live in TEAM-SETUP.md inside the folder.  Questions: ping Peter.",0.9,4.9,10.8,0.6,size=13,color="9FB2CC",italic=True,font=BFONT)
 
-out="/Users/petertosh/Desktop/Claude Cowork/OUTPUTS/Apollo Pipeline Orchestrator/Apollo-Pipeline-Team-Setup-Guide.pptx"
-prs.save(out)
-print("Saved:",out,"slides:",len(prs.slides._sldIdLst))
+if __name__ == "__main__":
+    import argparse
+    import os
+    p = argparse.ArgumentParser()
+    default_out = os.path.join(os.path.dirname(__file__), "Apollo-Pipeline-Team-Setup-Guide.pptx")
+    p.add_argument("--out", default=default_out, help="Output path for .pptx")
+    a = p.parse_args()
+    prs.save(a.out)
+    print("Saved:", a.out, "slides:", len(prs.slides._sldIdLst))
