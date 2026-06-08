@@ -4,6 +4,20 @@ Self-driving outbound pipeline for Gather AI sales reps. Every weekday morning t
 
 ---
 
+## About
+
+This project was built by Peter Tosh, Growth Engineer at Gather AI, to solve a specific problem: outbound prospecting was manual, repetitive, and required constant babysitting. Account selection, research, contact finding, and content writing all happened by hand, one account at a time, with no single view of what was worked, what landed, or what was next.
+
+The Apollo Pipeline Orchestrator turns outbound from a daily chore into a system that runs itself and asks for the rep only when it matters. It codifies the entire motion — scoring, sourcing, enrichment, content generation, staging, and response handling — into a reproducible, portable toolkit that any rep can stand up with one command.
+
+The design philosophy is explicit: automate everything that does not require human judgment, gate everything that does. High-value accounts (STRIKE) get a human review before anything sends. Volume accounts (NURTURE/QUALIFY) move fast with pre-trusted content. Nothing ships without an explicit confirm and activate. The rep stays the human on the calls, the LinkedIn videos, and the send button — the system handles the prep.
+
+All scoring rules, voice rules, and cadence logic are codified in files, not in anyone's head. The same engine runs on any account list. The hopper is just a ranked JSON file. Port the entire folder to another rep, run setup, and they are live.
+
+Built at Gather AI (warehouse drone automation), June 2026.
+
+---
+
 ## What It Does
 
 | Phase | What Happens |
