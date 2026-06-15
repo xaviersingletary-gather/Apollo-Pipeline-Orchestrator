@@ -33,32 +33,27 @@ Built by Peter Tosh at Gather AI, June 2026.
 
 ---
 
-## Team Onboarding (one-liner)
+## Team Onboarding
 
-A teammate can start from scratch in 5 steps:
+The fastest way to get running is to let Claude handle the wiring. Paste the repo into a Cowork session, connect your tools, and hand over your account list.
 
-```bash
-# 1. Clone
-git clone https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator.git
-cd Apollo-Pipeline-Orchestrator
+### Fast path (recommended)
 
-# 2. Scaffold
-python3 hopper/setup.py
+1. **Open Claude Cowork.** Paste the repo contents into the session.
+2. **Connect your stack.** Add Apollo, Slack, Gmail, and Clay as available tools.
+3. **Hand Claude your account list.** Paste your target accounts (names, domains, any notes you have).
+4. **Tell Claude:**
 
-# 3. Ask Claude to fill identity
-# "Fill my rep_config.json. Find my Slack ID and Apollo mailbox/sequence IDs."
-# Then mirror those IDs into hopper/apollo_config.json.
+   > "Set up the Apollo Pipeline Orchestrator for me. Fill my rep identity and Apollo config, score these accounts into a hopper, and register the morning driver and weekly digest scheduled tasks."
 
-# 4. Build hopper
-# Create hopper/accounts.jsonl then:
-python3 hopper/build_hopper.py
-# Or ask Claude to score your accounts via account-scoring skill.
+5. **One-time Apollo UI step.** Create the four custom fields in Apollo and wire them into your sequence template per `hopper/APOLLO_SETUP.md`. Claude will remind you.
+6. **Bank approvals.** Click **Run now** once on the `apollo-morning-driver` task in the Scheduled panel. Approve the tool prompts. Every future run is unattended.
 
-# 5. Wire Apollo once (UI only — custom fields + sequence template), then:
-# Register scheduled tasks in Cowork + click Run now once.
-```
+That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.
 
-Full written steps: `TEAM-SETUP.md`
+### Manual path
+
+If you prefer to run commands yourself or need to debug, the full CLI walkthrough is in `TEAM-SETUP.md`. Most reps never need it.
 
 ---
 
