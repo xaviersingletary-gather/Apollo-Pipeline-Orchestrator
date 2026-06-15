@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apollo Pipeline Orchestrator — Instruction Manual</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --java: #14E2AC;
+  --mineral: #38544A;
+  --surface: #F5F6F7;
+  --ink: #1A1A1C;
+  --white: #FFFFFF;
+  --muted: #6B7280;
+  --light-border: #E5E7EB;
+  --system-bg: #E8FDF5;
+  --system-text: #0B5B3A;
+  --human-bg: #FFF7ED;
+  --human-text: #92400E;
+  --strike-bg: #FEF2F2;
+  --strike-text: #991B1B;
+  --auto-bg: #EFF6FF;
+  --auto-text: #1E40AF;
+  --kill-bg: #F3F4F6;
+  --kill-text: #4B5563;
+  --clay: #17849E;
+  --apollo: #1E7E34;
+  --slack: #611f69;
+  --gmail: #C0392B;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Brand bar */
+.brand-bar {
+  height: 6px;
+  background: var(--java);
+}
+
+/* Header */
+header {
+  background: var(--ink);
+  color: var(--white);
+  padding: 40px 48px 32px;
+}
+header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+header .subtitle {
+  margin: 0;
+  color: #A3A3A3;
+  font-size: 16px;
+  font-weight: 400;
+}
+header .tagline {
+  margin: 14px 0 0;
+  color: var(--java);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* Layout */
+.wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 36px 48px 60px;
+}
+
+/* TOC */
+.toc {
+  background: var(--white);
+  border: 1px solid var(--light-border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 36px;
+}
+.toc h2 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px 24px;
+}
+.toc li a {
+  color: var(--mineral);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toc li a:hover { color: var(--java); }
+.toc li a::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--java);
+  flex-shrink: 0;
+}
+
+/* Section cards */
+.section {
+  background: var(--white);
+  border: 1px solid var(--light-border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+}
+.section h2 {
+  margin: 0 0 18px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section h3 {
+  margin: 24px 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--mineral);
+}
+.section p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.section p:last-child { margin-bottom: 0; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.badge-system { background: var(--system-bg); color: var(--system-text); }
+.badge-human { background: var(--human-bg); color: var(--human-text); }
+.badge-strike { background: var(--strike-bg); color: var(--strike-text); }
+.badge-auto { background: var(--auto-bg); color: var(--auto-text); }
+.badge-kill { background: var(--kill-bg); color: var(--kill-text); }
+
+/* Step lists */
+.steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.steps > li {
+  position: relative;
+  padding-left: 48px;
+  margin-bottom: 20px;
+  min-height: 36px;
+}
+.steps > li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--java);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+.steps > li strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.steps > li p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+/* Gate grid */
+.gate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.gate-card {
+  border: 1px solid var(--light-border);
+  border-radius: 10px;
+  padding: 18px;
+  background: var(--white);
+}
+.gate-card .gate-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.gate-card .gate-rule {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.gate-card .gate-action {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+}
+.gate-strike { border-top: 4px solid var(--strike-text); }
+.gate-strike .gate-name { color: var(--strike-text); }
+.gate-nurture { border-top: 4px solid var(--auto-text); }
+.gate-nurture .gate-name { color: var(--auto-text); }
+.gate-qualify { border-top: 4px solid #7C3AED; }
+.gate-qualify .gate-name { color: #7C3AED; }
+.gate-kill { border-top: 4px solid var(--kill-text); }
+.gate-kill .gate-name { color: var(--kill-text); }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+}
+th, td {
+  border: 1px solid var(--light-border);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 600;
+}
+tr:nth-child(even) { background: #FAFBFC; }
+code {
+  background: #F1F5F9;
+  color: #0F172A;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+/* Workflow Diagram */
+.diagram-wrap {
+  background: var(--white);
+  border: 1px solid var(--light-border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 36px;
+  overflow-x: auto;
+}
+.diagram-wrap h2 {
+  margin: 0 0 28px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Pure CSS flow diagram */
+.flow-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 900px;
+}
+.flow-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.flow-box {
+  border-radius: 10px;
+  padding: 14px 18px;
+  min-width: 160px;
+  max-width: 240px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.flow-box .box-title {
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.flow-box .box-desc {
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.4;
+}
+.flow-box .box-meta {
+  font-size: 10px;
+  margin-top: 6px;
+  opacity: 0.8;
+}
+
+/* System boxes */
+.box-scheduler { background: var(--ink); color: var(--white); border: 2px solid var(--java); }
+.box-clay { background: #E6F7FA; color: #0E5A6E; border: 2px solid var(--clay); }
+.box-clay .box-title { color: var(--clay); }
+.box-apollo { background: #E8F5E9; color: #155724; border: 2px solid var(--apollo); }
+.box-apollo .box-title { color: var(--apollo); }
+.box-slack { background: #F3E8F5; color: #4A154B; border: 2px solid var(--slack); }
+.box-slack .box-title { color: var(--slack); }
+.box-gmail { background: #FDEDEC; color: #922B21; border: 2px solid var(--gmail); }
+.box-gmail .box-title { color: var(--gmail); }
+.box-human { background: var(--human-bg); color: var(--human-text); border: 2px solid #F59E0B; }
+.box-human .box-title { color: var(--human-text); }
+.box-gate { background: #FEF9E7; color: #7D6608; border: 2px solid #F1C40F; }
+.box-gate .box-title { color: #9A7D1E; }
+
+/* Arrows */
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 18px;
+  height: 24px;
+}
+.flow-arrow-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.flow-arrow-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+}
+.flow-arrow-col span {
+  font-size: 20px;
+  color: var(--java);
+  line-height: 1;
+}
+.flow-arrow-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Branch row */
+.branch-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 8px 0 16px;
+}
+.branch-box {
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: center;
+  min-width: 140px;
+}
+.branch-box .branch-title {
+  font-size: 11px;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+.branch-box .branch-desc {
+  font-size: 10px;
+  margin: 0;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 8px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 2px solid;
+}
+
+/* Callout */
+.callout {
+  background: var(--system-bg);
+  border-left: 4px solid var(--java);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.callout strong { color: var(--system-text); }
+.callout p { margin: 0; color: var(--system-text); }
+
+.warning {
+  background: #FEF2F2;
+  border-left-color: #EF4444;
+}
+.warning p { color: var(--strike-text); }
+.warning strong { color: var(--strike-text); }
+
+/* File reference grid */
+.file-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1px;
+  background: var(--light-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.file-grid > div {
+  background: var(--white);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+.file-grid > div:nth-child(odd) {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 12px;
+  color: var(--mineral);
+  background: #FAFBFC;
+}
+.file-grid > div:nth-child(even) {
+  color: var(--muted);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .wrap { padding: 24px 20px; }
+  header { padding: 28px 24px; }
+  header h1 { font-size: 24px; }
+  .toc ul { grid-template-columns: 1fr; }
+  .section { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+
+<header>
+  <div class="tagline">Apollo Pipeline Orchestrator</div>
+  <h1>Instruction Manual</h1>
+  <p class="subtitle">Self-driving outbound pipeline for Gather AI sales reps. Automate the prep. Gate everything that ships.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#what">What This Is</a></li>
+      <li><a href="#onboard">Team Onboarding</a></li>
+      <li><a href="#gate">The Gate System</a></li>
+      <li><a href="#daily">Daily Workflow</a></li>
+      <li><a href="#apollo-setup">Apollo One-Time Setup</a></li>
+      <li><a href="#diagram">Workflow Diagram</a></li>
+      <li><a href="#watcher">Response Watcher</a></li>
+      <li><a href="#digest">Weekly Digest</a></li>
+      <li><a href="#files">File Reference</a></li>
+      <li><a href="#troubleshoot">Troubleshooting & Gotchas</a></li>
+    </ul>
+  </nav>
+
+  <!-- What This Is -->
+  <section class="section" id="what">
+    <h2>What This Is</h2>
+    <p>
+      The Apollo Pipeline Orchestrator is a self-driving outbound system for Gather AI strategic sales reps.
+      Every weekday morning it picks the top-scored account from a ranked hopper, sources up to 20 ICP contacts,
+      enriches verified emails, writes personalized first-touch content per contact, stages everything in Apollo,
+      and reports back via Slack. The human rep only reviews and confirms send.
+    </p>
+    <p>
+      <strong>Philosophy:</strong> Automate everything that does not require human judgment. Gate everything that does.
+      Nothing ships without an explicit confirm and activate. The rep stays the human on the calls, the LinkedIn videos,
+      and the send button. The system handles the prep.
+    </p>
+    <p>
+      All scoring rules, voice rules, and cadence logic are in files, not in anyone's head. Clone the repo,
+      run setup, fill your identity, and you are live.
+    </p>
+  </section>
+
+  <!-- Team Onboarding -->
+  <section class="section" id="onboard">
+    <h2>Team Onboarding</h2>
+
+    <h3>Fast Path (Recommended)</h3>
+    <p>The fastest way to get running is to let Claude handle the wiring. Paste the repo into a Cowork session, connect your tools, and hand over your account list.</p>
+
+    <div class="callout">
+      <p><strong>Repo link:</strong> <a href="https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator" style="color:var(--system-text);font-weight:600;">https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator</a> — copy this and paste it into Claude Cowork.</p>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <strong>Open Claude Cowork.</strong> Paste the repo contents into the session.
+      </li>
+      <li>
+        <strong>Connect your stack.</strong> Add Apollo, Slack, Gmail, and Clay as available tools.
+      </li>
+      <li>
+        <strong>Hand Claude your account list.</strong> Paste your target accounts (names, domains, any notes you have).
+      </li>
+      <li>
+        <strong>Tell Claude:</strong> "Set up the Apollo Pipeline Orchestrator for me. Fill my rep identity and Apollo config, score these accounts into a hopper, and register the morning driver and weekly digest scheduled tasks."
+      </li>
+      <li>
+        <strong>One-time Apollo UI step.</strong> Create the four custom fields in Apollo and wire them into your sequence template per <code>hopper/APOLLO_SETUP.md</code>. Claude will remind you.
+      </li>
+      <li>
+        <strong>Bank approvals.</strong> Click <strong>Run now</strong> once on the <code>apollo-morning-driver</code> task in the Scheduled panel. Approve the tool prompts. Every future run is unattended.
+      </li>
+    </ol>
+
+    <div class="callout">
+      <p><strong>That is it.</strong> The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.</p>
+    </div>
+
+    <h3>Manual Path</h3>
+    <p>If you prefer to run commands yourself or need to debug, the full CLI walkthrough is in <code>TEAM-SETUP.md</code>. Most reps never need it.</p>
+  </section>
+
+  <!-- The Gate System -->
+  <section class="section" id="gate">
+    <h2>The Gate System</h2>
+    <p>Accounts are ranked on a Fit x Signal matrix. The gate decides how much human oversight each account gets before it ships.</p>
+
+    <div class="gate-grid">
+      <div class="gate-card gate-strike">
+        <div class="gate-name">STRIKE</div>
+        <div class="gate-rule">Fit >= 70, Signal >= 70</div>
+        <div class="gate-action">
+          <span class="badge badge-strike">Approve Gate</span><br>
+          Prep + stage the CSV. Slack the rep. Enroll ONLY after explicit human yes. Protects the no-spam bar on top logos.
+        </div>
+      </div>
+      <div class="gate-card gate-nurture">
+        <div class="gate-name">NURTURE</div>
+        <div class="gate-rule">Fit >= 70, Signal &lt; 70</div>
+        <div class="gate-action">
+          <span class="badge badge-auto">Auto Gate</span><br>
+          Pre-trusted. One-tap enroll. No content review required.
+        </div>
+      </div>
+      <div class="gate-card gate-qualify">
+        <div class="gate-name">QUALIFY</div>
+        <div class="gate-rule">Fit 40-69, Signal >= 40</div>
+        <div class="gate-action">
+          <span class="badge badge-auto">Auto Gate</span><br>
+          Pre-trusted. One-tap enroll. No content review required.
+        </div>
+      </div>
+      <div class="gate-card gate-kill">
+        <div class="gate-name">KILL / IGNORE</div>
+        <div class="gate-rule">Either &lt; 40</div>
+        <div class="gate-action">
+          <span class="badge badge-kill">Skip</span><br>
+          Never worked. Off the queue.
+        </div>
+      </div>
+    </div>
+
+    <h3>Status Lifecycle</h3>
+    <p>Every account moves through states tracked in <code>hopper/hopper.jsonl</code>:</p>
+    <p><code>todo &rarr; in_progress &rarr; staged_for_approval &rarr; enrolled &rarr; done | parked</code></p>
+    <ul style="color: var(--muted); font-size: 13px; padding-left: 20px;">
+      <li><strong>todo</strong> — in the queue, not yet worked</li>
+      <li><strong>in_progress</strong> — Morning Driver is mid-run (prevents double-work on re-fire)</li>
+      <li><strong>staged_for_approval</strong> — STRIKE only. CSV built, waiting on rep</li>
+      <li><strong>enrolled</strong> — contacts logged to watcher state; ready for Apollo upload</li>
+      <li><strong>parked / done</strong> — out of the active queue</li>
+    </ul>
+  </section>
+
+  <!-- Daily Workflow -->
+  <section class="section" id="daily">
+    <h2>Daily Workflow</h2>
+
+    <h3>Morning (System Runs)</h3>
+    <p>At ~07:04 on weekdays, the Morning Driver fires unattended:</p>
+    <ol class="steps">
+      <li>
+        <strong>Pick next account.</strong> Reads <code>hopper.jsonl</code>, returns top-ranked todo account. Skips KILL. Flags L-confidence accounts for research.
+      </li>
+      <li>
+        <strong>Claim it.</strong> Locks the account to <code>in_progress</code> so a re-fire never double-works it.
+      </li>
+      <li>
+        <strong>Research.</strong> Pulls existing research file (&lt;14 days) or runs fresh <code>account-research</code>. Extracts triggers, sub-orgs, pain points.
+      </li>
+      <li>
+        <strong>Find + enrich contacts.</strong> Calls Clay with ICP titles (VP/Director+ of Ops, Supply Chain, Logistics, Distribution, Fulfillment). Paginates up to 3 passes. Keeps only verified-email contacts.
+      </li>
+      <li>
+        <strong>Generate content.</strong> Writes bespoke email (subject + body), 30-45s script (call opener + LinkedIn video), and &lt;300-char connection note per contact.
+      </li>
+      <li>
+        <strong>Write CSVs.</strong> Outputs <code>apollo-upload.csv</code> (run record) and <code>apollo-import.csv</code> (Apollo-ready custom fields).
+      </li>
+      <li>
+        <strong>Stage.</strong> Marks account <code>staged_for_approval</code> (STRIKE) or queues for auto enrollment (NURTURE/QUALIFY).
+      </li>
+      <li>
+        <strong>Write run log.</strong> Saves audit trail to <code>runs/&lt;date&gt;-&lt;account&gt;-run.md</code>.
+      </li>
+      <li>
+        <strong>Slack report.</strong> ONE message covering all accounts worked: counts, gate tier, queue depth, confirm-enroll instruction.
+      </li>
+    </ol>
+
+    <h3>Mid-Morning (Human Touch)</h3>
+    <ol class="steps">
+      <li>
+        <strong>Review Slack report.</strong> Check contact counts and gate tier.
+      </li>
+      <li>
+        <strong>STRIKE review.</strong> Open the run log. Read email + script for each contact. Reply "enroll [account]" in Slack when satisfied.
+      </li>
+      <li>
+        <strong>NURTURE/QUALIFY confirm.</strong> Rubber-stamp with the same Slack reply.
+      </li>
+      <li>
+        <strong>Import CSV.</strong> In Apollo: Import &rarr; CSV &rarr; match on Email &rarr; map <code>Gather_*</code> columns to custom fields.
+      </li>
+      <li>
+        <strong>Activate.</strong> Unpause the sequence. Day-1 email is manual (you send it).
+      </li>
+    </ol>
+
+    <div class="callout warning">
+      <p><strong>Critical:</strong> Never activate a contact before the import populates their custom fields, or a blank email sends. Always import first, then activate.</p>
+    </div>
+
+    <h3>Throughout the Day (Response Watcher)</h3>
+    <p>Every 15 minutes the system polls Gmail for replies from active contacts:</p>
+    <ul style="color: var(--muted); font-size: 13px; padding-left: 20px;">
+      <li><strong>Real replies</strong> &rarr; auto-fires lead scoring, produces handover doc, Slacks you the score + link</li>
+      <li><strong>OOO replies</strong> &rarr; Slacks you with "needs guidance" tag. No scoring.</li>
+      <li><strong>Wrong-person replies</strong> &rarr; Slacks you with "needs guidance" tag. No scoring.</li>
+    </ul>
+  </section>
+
+  <!-- Apollo One-Time Setup -->
+  <section class="section" id="apollo-setup">
+    <h2>Apollo One-Time Setup</h2>
+    <p>Apollo custom fields and sequence wiring are done once in the Apollo UI. After that, each run is a 1-minute CSV import.</p>
+
+    <h3>Step 1 — Create 4 Custom Fields (~3 min)</h3>
+    <ol style="color: var(--muted); font-size: 13px; padding-left: 20px; margin-bottom: 16px;">
+      <li>Top-right gear icon &rarr; <strong>Settings</strong></li>
+      <li>Left nav &rarr; <strong>Custom Fields</strong> (under Data / General)</li>
+      <li>Make sure object selector is <strong>Contacts/People</strong></li>
+      <li>Click <strong>+ Add Custom Field</strong> for each:</li>
+    </ol>
+    <table>
+      <tr><th>Field Name (type exactly)</th><th>Holds</th><th>Type</th></tr>
+      <tr><td><code>Gather_Email_Subject</code></td><td>Day-1 email subject</td><td>Text</td></tr>
+      <tr><td><code>Gather_Email_Body</code></td><td>Day-1 bespoke email body</td><td>Text (or Long Text)</td></tr>
+      <tr><td><code>Gather_Script</code></td><td>30-45s script (call opener + LinkedIn video)</td><td>Text</td></tr>
+      <tr><td><code>Gather_Connection_Note</code></td><td>LinkedIn connection note (&lt;300 chars)</td><td>Text</td></tr>
+    </table>
+
+    <h3>Step 2 — Wire the Sequence (~5 min)</h3>
+    <p>Open your target sequence. Wire each step to the custom field variables via the <code>{ }</code> picker. <strong>Never hand-type the tokens.</strong></p>
+    <ul style="color: var(--muted); font-size: 13px; padding-left: 20px;">
+      <li><strong>Day-1 email (position 1):</strong> Subject = <code>Gather_Email_Subject</code>, Body = <code>Gather_Email_Body</code></li>
+      <li><strong>Call steps (Day 1, 3, 8):</strong> Notes = <code>Gather_Script</code></li>
+      <li><strong>LinkedIn video step (Day 5/6):</strong> Notes = <code>Gather_Script</code></li>
+      <li><strong>LinkedIn connection (Day 1):</strong> Message = <code>Gather_Connection_Note</code></li>
+    </ul>
+
+    <h3>Step 3 — Per-Run Import (1 minute)</h3>
+    <p>Each run writes <code>apollo-import.csv</code> with headers matching the custom field names. In Apollo: Import &rarr; CSV &rarr; match on <strong>Email</strong> &rarr; map each <code>Gather_*</code> column to its field. Run. Then review and activate.</p>
+  </section>
+
+  <!-- Workflow Diagram -->
+  <div class="diagram-wrap" id="diagram">
+    <h2>Workflow Diagram</h2>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--ink);border-color:var(--java)"></span>Scheduler / Cowork</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#E6F7FA;border-color:var(--clay)"></span>Clay (Sourcing / Enrich)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#E8F5E9;border-color:var(--apollo)"></span>Apollo (CRM / Sequence)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#F3E8F5;border-color:var(--slack)"></span>Slack (Reports)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#FDEDEC;border-color:var(--gmail)"></span>Gmail (Reply Watch)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--human-bg);border-color:#F59E0B"></span>Human (Review / Confirm)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#FEF9E7;border-color:#F1C40F"></span>Decision Gate</div>
+    </div>
+
+    <div class="flow-diagram">
+      <!-- Row 1: Trigger -->
+      <div class="flow-row">
+        <div class="flow-box box-scheduler">
+          <div class="box-title">Scheduler</div>
+          <div class="box-desc">Cron 7:04am weekdays<br/>Spawns Claude session</div>
+          <div class="box-meta">N0</div>
+        </div>
+      </div>
+      <div class="flow-arrow">&#x2193;</div>
+
+      <!-- Row 2: Morning Driver -->
+      <div class="flow-row">
+        <div class="flow-box box-scheduler" style="max-width: 300px;">
+          <div class="box-title">Morning Driver</div>
+          <div class="box-desc">Picks top account, claims lock,<br/>checks research freshness</div>
+          <div class="box-meta">N1 &rarr; N2 &rarr; N3</div>
+        </div>
+      </div>
+      <div class="flow-arrow">&#x2193;</div>
+
+      <!-- Row 3: Sourcing + Enrichment -->
+      <div class="flow-row">
+        <div class="flow-box box-clay">
+          <div class="box-title">Clay Find</div>
+          <div class="box-desc">Find ICP contacts at company<br/>VP/Director+, US-based</div>
+          <div class="box-meta">N4 (up to 3 passes)</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--muted);font-size:18px;">&#x2192;</div>
+        <div class="flow-box box-clay">
+          <div class="box-title">Clay Enrich</div>
+          <div class="box-desc">Add verified emails<br/>Poll until complete</div>
+          <div class="box-meta">N6</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--muted);font-size:18px;">&#x2192;</div>
+        <div class="flow-box box-scheduler">
+          <div class="box-title">Filter</div>
+          <div class="box-desc">Director+ only<br/>Drop wrong-co / noise</div>
+          <div class="box-meta">N5</div>
+        </div>
+      </div>
+      <div class="flow-arrow">&#x2193;</div>
+
+      <!-- Row 4: Content Generation -->
+      <div class="flow-row">
+        <div class="flow-box box-scheduler" style="max-width: 320px;">
+          <div class="box-title">Content Generation</div>
+          <div class="box-desc">Bespoke email + subject per contact<br/>30-45s script (call + LinkedIn video)<br/>LinkedIn connection note</div>
+          <div class="box-meta">N7</div>
+        </div>
+      </div>
+      <div class="flow-arrow">&#x2193;</div>
+
+      <!-- Row 5: Write + Apollo -->
+      <div class="flow-row">
+        <div class="flow-box box-scheduler">
+          <div class="box-title">Write CSVs</div>
+          <div class="box-desc">apollo-upload.csv<br/>apollo-import.csv</div>
+          <div class="box-meta">N8</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--muted);font-size:18px;">&#x2192;</div>
+        <div class="flow-box box-apollo">
+          <div class="box-title">Apollo Dedupe</div>
+          <div class="box-desc">Search by email<br/>Bulk create new contacts</div>
+          <div class="box-meta">N9</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--muted);font-size:18px;">&#x2192;</div>
+        <div class="flow-box box-gate">
+          <div class="box-title">Gate Decision</div>
+          <div class="box-desc">STRIKE &rarr; approve<br/>NURTURE/QUALIFY &rarr; auto<br/>KILL &rarr; skip</div>
+          <div class="box-meta">N10</div>
+        </div>
+      </div>
+      <div class="flow-arrow">&#x2193;</div>
+
+      <!-- Row 6: Branch -->
+      <div class="branch-row">
+        <div class="branch-box box-human">
+          <div class="branch-title">STRIKE</div>
+          <div class="branch-desc">Stage for approval<br/>Slack rep review</div>
+        </div>
+        <div class="branch-box box-apollo" style="background:#D4EDDA;">
+          <div class="branch-title">NURTURE / QUALIFY</div>
+          <div class="branch-desc">Auto-trusted<br/>Queue for enrollment</div>
+        </div>
+      </div>
+
+      <!-- Row 7: Human Confirm -->
+      <div class="flow-row">
+        <div class="flow-box box-human" style="max-width: 320px;">
+          <div class="box-title">Human Review & Confirm</div>
+          <div class="box-desc">Review content (STRIKE)<br/>Reply "enroll [account]" in Slack<br/>Import CSV to Apollo<br/>Unpause sequence</div>
+          <div class="box-meta">N13 &rarr; N14</div>
+        </div>
+      </div>
+      <div class="flow-arrow">&#x2193;</div>
+
+      <!-- Row 8: Response Watcher -->
+      <div class="flow-row">
+        <div class="flow-box box-gmail">
+          <div class="box-title">Gmail Poll</div>
+          <div class="box-desc">Every 15 minutes<br/>Search threads from active contacts</div>
+          <div class="box-meta">N17</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--muted);font-size:18px;">&#x2192;</div>
+        <div class="flow-box box-gate">
+          <div class="box-title">Classify Reply</div>
+          <div class="box-desc">Real / OOO / Wrong-person<br/>Bias ambiguous &rarr; real</div>
+          <div class="box-meta">N18</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--muted);font-size:18px;">&#x2192;</div>
+        <div class="flow-box box-slack">
+          <div class="box-title">Slack Alert</div>
+          <div class="box-desc">Real: score + handoff doc<br/>OOO/Wrong: needs guidance</div>
+          <div class="box-meta">N18 action</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Response Watcher -->
+  <section class="section" id="watcher">
+    <h2>Response Watcher</h2>
+    <p>The pull-side companion to the Morning Driver. Polls Gmail every 15 minutes for replies from contacts enrolled in active sequences.</p>
+
+    <h3>State Files</h3>
+    <table>
+      <tr><th>File</th><th>Purpose</th></tr>
+      <tr><td><code>state/active-contacts.jsonl</code></td><td>Appended by Morning Driver on every enrollment. Lists who to watch.</td></tr>
+      <tr><td><code>state/processed-replies.jsonl</code></td><td>Appended by Watcher. Prevents re-processing the same reply.</td></tr>
+    </table>
+
+    <h3>Classifier Rules</h3>
+    <table>
+      <tr><th>Classification</th><th>Triggers</th><th>Action</th></tr>
+      <tr>
+        <td><span class="badge badge-strike">Real</span></td>
+        <td>Any substantive reply: "tell me more," "not interested," "send info," questions, objections.</td>
+        <td>Auto-fires lead scoring, produces handover doc, Slacks score + link.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-auto">OOO</span></td>
+        <td>"Out of office," "on vacation," "will be back on [date]," auto-reply formatting.</td>
+        <td>Slacks rep with reply text + "needs guidance" tag. No scoring.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-kill">Wrong Person</span></td>
+        <td>"No longer with company," "wrong person," "remove me," "not my area."</td>
+        <td>Slacks rep with reply text + "needs guidance" tag. No scoring.</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <p><strong>Bias rule:</strong> When genuinely ambiguous, default to <strong>real</strong> and let the rep sort it. Under-classifying is worse than over-classifying.</p>
+    </div>
+  </section>
+
+  <!-- Weekly Digest -->
+  <section class="section" id="digest">
+    <h2>Weekly Digest</h2>
+    <p>Every Friday early afternoon, the system auto-generates a rollup and Slacks it to the rep:</p>
+    <ul style="color: var(--muted); font-size: 13px; padding-left: 20px;">
+      <li>Accounts worked this week</li>
+      <li>Contacts enrolled by gate tier</li>
+      <li>Replies by classification (real / OOO / wrong-person)</li>
+      <li>Hopper depth with <strong>REPLENISH</strong> flag when todo accounts drop below 3</li>
+    </ul>
+    <p>When the REPLENISH flag fires, it is time to re-score or add new accounts to the hopper.</p>
+  </section>
+
+  <!-- File Reference -->
+  <section class="section" id="files">
+    <h2>File Reference</h2>
+    <p>What each file in the project does:</p>
+
+    <h3>Core Pipeline</h3>
+    <div class="file-grid">
+      <div><code>hopper/gate.py</code></div><div>Queue + gate engine. Next, status, stage, enroll, approve. Pure Python, no network calls.</div>
+      <div><code>hopper/digest.py</code></div><div>Weekly rollup generator. Reads run logs and state files.</div>
+      <div><code>hopper/build_hopper.py</code></div><div>Fit x Signal scoring + hopper builder from accounts JSONL.</div>
+      <div><code>hopper/setup.py</code></div><div>Scaffolds workspace, creates state dirs, hydrates configs from templates.</div>
+    </div>
+
+    <h3>Configuration</h3>
+    <div class="file-grid">
+      <div><code>hopper/rep_config.json</code></div><div>Your identity: Slack ID, Apollo mailbox, sequence, signature.</div>
+      <div><code>hopper/apollo_config.json</code></div><div>Shared Apollo wiring: sequence ID, custom field names, ICP titles, import CSV schema.</div>
+      <div><code>hopper/hopper.jsonl</code></div><div>Your ranked account queue. One JSON object per line.</div>
+    </div>
+
+    <h3>Prompts & Procedures</h3>
+    <div class="file-grid">
+      <div><code>hopper/MORNING_DRIVER.md</code></div><div>The daily procedure = the scheduled task prompt. Self-contained for unattended runs.</div>
+      <div><code>hopper/GATE.md</code></div><div>Hybrid-by-quadrant gate rules. Read this, then use the CLI.</div>
+      <div><code>hopper/APOLLO_SETUP.md</code></div><div>One-time custom field + sequence wiring instructions.</div>
+    </div>
+
+    <h3>Runtime State</h3>
+    <div class="file-grid">
+      <div><code>state/active-contacts.jsonl</code></div><div>Contacts enrolled in sequences (watcher reads this).</div>
+      <div><code>state/processed-replies.jsonl</code></div><div>Reply deduplication log (watcher appends this).</div>
+      <div><code>state/pending-approvals.jsonl</code></div><div>STRIKE accounts staged awaiting operator yes.</div>
+    </div>
+
+    <h3>Audit Logs</h3>
+    <div class="file-grid">
+      <div><code>runs/YYYY-MM-DD-&lt;Account&gt;-run.md</code></div><div>Per-run audit log: steps, counts, gate decision, CSV paths, failures.</div>
+    </div>
+
+    <h3>Skills (Claude Cowork)</h3>
+    <div class="file-grid">
+      <div><code>gather-apollo-pipeline-skill/</code></div><div>Skill: "Run the full push-side pipeline on [account]."</div>
+      <div><code>gather-apollo-response-watcher-skill/</code></div><div>Skill: "Watch Gmail for replies and route them."</div>
+      <div><code>apollo-onboard-skill/</code></div><div>Skill: "Run Apollo setup" (custom fields, sequence wiring).</div>
+    </div>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section class="section" id="troubleshoot">
+    <h2>Troubleshooting & Gotchas</h2>
+
+    <table>
+      <tr><th>Problem</th><th>Cause</th><th>Fix</th></tr>
+      <tr>
+        <td>Unattended run does nothing / stalls</td>
+        <td>Tool approvals not banked (Step 6)</td>
+        <td>Click <strong>Run now</strong> once in Cowork Scheduled panel. Approve each tool prompt. Future runs fire unattended.</td>
+      </tr>
+      <tr>
+        <td>Emails send with blank body or literal tokens</td>
+        <td>Custom field tokens hand-typed instead of inserted via <code>{ }</code> picker</td>
+        <td>Always insert merge variables via Apollo's variable button. Never type <code>{{...}}</code> by hand.</td>
+      </tr>
+      <tr>
+        <td>Blank email sends to contact</td>
+        <td>Activated before CSV import populated custom fields</td>
+        <td>Import CSV first. Verify preview renders correctly. Then activate.</td>
+      </tr>
+      <tr>
+        <td>Clay returns 0 contacts after 3 passes</td>
+        <td>Account genuinely has no ICP contacts, or domain mismatch</td>
+        <td>Slack notice fires automatically. Account returns to todo. Continue run.</td>
+      </tr>
+      <tr>
+        <td>Account stuck in "in_progress"</td>
+        <td>Session crashed or was interrupted before releasing lock</td>
+        <td>Run <code>python3 hopper/gate.py set "&lt;account&gt;" todo</code> to release.</td>
+      </tr>
+      <tr>
+        <td>Same reply scored twice</td>
+        <td><code>processed-replies.jsonl</code> not being written</td>
+        <td>Check state file permissions. Watcher appends only; should never duplicate.</td>
+      </tr>
+      <tr>
+        <td>Sequence missing at enroll time</td>
+        <td>Sequence deleted, renamed, or paused</td>
+        <td>Verify <code>apollo_config.json</code> sequence_id matches live sequence in Apollo UI.</td>
+      </tr>
+    </table>
+
+    <h3>Safety Invariants</h3>
+    <div class="callout">
+      <p><strong>1.</strong> Account locked (<code>in_progress</code>) before work, released on any exit.</p>
+      <p><strong>2.</strong> Unattended driver NEVER calls <code>add_contact_ids</code> or <code>approve</code>. Nothing sends without human confirm + activate.</p>
+      <p><strong>3.</strong> All Apollo/Slack IDs come from live in-session tool calls; never fabricated.</p>
+      <p><strong>4.</strong> <code>processed-replies.jsonl</code> + <code>active-contacts.jsonl</code> keep the watcher idempotent across 15-minute runs.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Built by Peter Tosh at Gather AI &middot; June 2026 &middot; Apollo Pipeline Orchestrator
+</footer>
+
+</body>
+</html>

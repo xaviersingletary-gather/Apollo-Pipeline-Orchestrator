@@ -39,6 +39,8 @@ The fastest way to get running is to let Claude handle the wiring. Paste the rep
 
 ### Fast path (recommended)
 
+**Repo link:** https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator — copy this and paste it into Claude Cowork.
+
 1. **Open Claude Cowork.** Paste the repo contents into the session.
 2. **Connect your stack.** Add Apollo, Slack, Gmail, and Clay as available tools.
 3. **Hand Claude your account list.** Paste your target accounts (names, domains, any notes you have).
