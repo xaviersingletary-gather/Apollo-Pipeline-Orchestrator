@@ -50,13 +50,23 @@ def create_from_template(tmpl, dest, skip_if_exists=True):
         print(f"  WARN  template not found: {tmpl}")
 
 
-def validate_json(path, label):
+def validate_json(path, label, required_keys=None):
     print(f"\n=== {label} ===")
     try:
         cfg = json.load(open(path))
-        missing = [k for k, v in cfg.items() if isinstance(v, str) and (v.strip().startswith("<") or v.strip().startswith("YOUR_"))]
-        if missing:
-            print(f"STILL NEEDS FILLING: {', '.join(missing)}")
+        issues = []
+        if required_keys:
+            for k in required_keys:
+                if k not in cfg:
+                    issues.append(f"missing: {k}")
+                elif isinstance(cfg[k], str) and (cfg[k].strip().startswith("<") or cfg[k].strip().startswith("YOUR_")):
+                    issues.append(f"placeholder: {k}")
+        else:
+            for k, v in cfg.items():
+                if isinstance(v, str) and (v.strip().startswith("<") or v.strip().startswith("YOUR_")):
+                    issues.append(f"placeholder: {k}")
+        if issues:
+            print(f"STILL NEEDS FILLING: {', '.join(issues)}")
             return False
         else:
             print("All fields filled.")
@@ -67,6 +77,35 @@ def validate_json(path, label):
     except Exception as e:
         print(f"Could not read {path}: {e}")
         return False
+
+
+def migrate_apollo_ids(rep_path, apollo_path):
+    """Copy legacy Apollo keys from rep_config.json to apollo_config.json for backwards compatibility."""
+    try:
+        if not os.path.exists(apollo_path):
+            return
+        rep_cfg = json.load(open(rep_path))
+        apollo_cfg = json.load(open(apollo_path))
+        mapping = {
+            "apollo_sequence_id": "sequence_id",
+            "apollo_sequence_name": "sequence_name",
+            "apollo_sender_email_account_id": "sender_email_account_id"
+        }
+        migrated = False
+        for old_key, new_key in mapping.items():
+            if old_key in rep_cfg and (new_key not in apollo_cfg or apollo_cfg[new_key].strip().startswith("<") or apollo_cfg[new_key].strip().startswith("YOUR_")):
+                apollo_cfg[new_key] = rep_cfg[old_key]
+                migrated = True
+                print(f"  Migrated {old_key} -> {new_key}")
+        if migrated:
+            with open(apollo_path, "w") as f:
+                json.dump(apollo_cfg, f, indent=2)
+                f.write("\n")
+            print("Migrated Apollo IDs from rep_config.json to apollo_config.json")
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        print(f"  Could not migrate Apollo IDs: {e}")
 
 
 def hydrate_morning_driver():
@@ -102,8 +141,11 @@ def main():
     create_from_template(f"{HERE}/apollo_config.template.json", f"{HERE}/apollo_config.json")
 
     print("")
-    rep_ok = validate_json(f"{HERE}/rep_config.json", "rep_config.json")
-    apollo_ok = validate_json(f"{HERE}/apollo_config.json", "apollo_config.json")
+    rep_ok = validate_json(f"{HERE}/rep_config.json", "rep_config.json", required_keys=["rep_name", "rep_email", "slack_user_id"])
+
+    migrate_apollo_ids(f"{HERE}/rep_config.json", f"{HERE}/apollo_config.json")
+
+    apollo_ok = validate_json(f"{HERE}/apollo_config.json", "apollo_config.json", required_keys=["sequence_id", "sequence_name", "sender_email_account_id"])
 
     n = 0
     hp = f"{BASE}/hopper/hopper.jsonl"

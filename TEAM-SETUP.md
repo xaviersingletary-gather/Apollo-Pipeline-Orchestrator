@@ -5,7 +5,54 @@ You have Claude, Apollo, Clay, Gmail, and Slack connected. This gets you running
 
 ---
 
-## Step 0 — Clone from GitHub
+## Pre-flight Checklist
+
+Before you start, confirm ALL of the following:
+
+- [ ] **Apollo account with Gmail mailbox connected.** Your sender identity and sequence enrollment
+      both require an active Gmail mailbox inside Apollo.
+- [ ] **Cowork connected to Apollo, Slack, Gmail, and Clay.** All four tools must show as available
+      in your tool panel before you trigger setup.
+- [ ] **Account list ready.** Have your target accounts (names, domains, any notes) copied and ready
+      to paste into the session.
+- [ ] **rep_config.json pre-filled (optional but recommended).** If you already know your Slack user
+      ID, Apollo mailbox ID, and sequence ID, drop them into `hopper/rep_config.json` before starting.
+      If not, Claude will discover them automatically.
+
+**All boxes checked?** Use the fast path below.
+
+---
+
+## Fast path (recommended)
+
+The fastest way to get running is to let Claude handle the wiring. This is the same flow described
+in the README.
+
+1. **Open Claude Cowork.** Paste the repo contents into the session (or add the repo to Context).
+2. **Connect your stack.** Add Apollo, Slack, Gmail, and Clay as available tools.
+3. **Hand Claude your account list.** Paste your target accounts.
+4. **Tell Claude:**
+
+   > "Set up the Apollo Pipeline Orchestrator for me. Fill my rep identity and Apollo config,
+   > score these accounts into a hopper, and register the morning driver and weekly digest
+   > scheduled tasks."
+
+5. **One-time Apollo UI step.** Create the four custom fields in Apollo and wire them into your
+   sequence template per `hopper/APOLLO_SETUP.md`. Claude will pause and guide you.
+6. **Bank approvals.** Click **Run now** once on the `apollo-morning-driver` task in the Scheduled
+   panel. Approve the tool prompts. Every future run is unattended.
+
+That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content,
+and Slacking you the staged batch.
+
+---
+
+## Manual walkthrough (if the fast path fails)
+
+If you prefer to run commands yourself, need to debug, or the fast path errors out, here is the
+full CLI walkthrough. Most reps never need this.
+
+### Step 0 — Clone from GitHub
 
 ```bash
 git clone https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator.git
@@ -14,9 +61,7 @@ cd Apollo-Pipeline-Orchestrator
 
 Everything you need is inside this folder. Nothing points at another rep's machine.
 
----
-
-## Step 1 — Scaffold (1 command)
+### Step 1 — Scaffold (1 command)
 
 ```bash
 python3 hopper/setup.py
@@ -25,9 +70,7 @@ python3 hopper/setup.py
 This creates your `state/`, `runs/`, empty hopper, `rep_config.json`, and `apollo_config.json` from
 templates. It reports which fields still need filling.
 
----
-
-## Step 2 — Fill in your identity (hand this to Claude)
+### Step 2 — Fill in your identity (hand this to Claude)
 
 Open `hopper/rep_config.json`. Paste this to Claude:
 
@@ -38,9 +81,7 @@ Open `hopper/rep_config.json`. Paste this to Claude:
 Then update `hopper/apollo_config.json` with your `sequence_id`, `sequence_name`, and
 `sender_email_account_id` (same values), so the pipeline targets YOUR sequence.
 
----
-
-## Step 3 — Build your hopper (hand this to Claude)
+### Step 3 — Build your hopper (hand this to Claude)
 
 Give Claude your account list (paste names, or create `hopper/accounts.jsonl` with one JSON
 object per line containing: name, domain, fit array, sig array, conf, anchor, move).
@@ -59,9 +100,7 @@ Or ask Claude:
 
 Sanity-check: `python3 hopper/gate.py status` should list your ranked accounts.
 
----
-
-## Step 4 — One-time Apollo wiring (you, in the Apollo UI)
+### Step 4 — One-time Apollo wiring (you, in the Apollo UI)
 
 Follow `hopper/APOLLO_SETUP.md`:
 - Create 4 custom fields: `Gather_Email_Subject`, `Gather_Email_Body`, `Gather_Script`, `Gather_Connection_Note`.
@@ -70,9 +109,7 @@ Follow `hopper/APOLLO_SETUP.md`:
   on the call and LinkedIn steps.
 - Per run you import that day's `apollo-import.csv` (match on Email) to fill the fields.
 
----
-
-## Step 5 — Register your scheduled tasks (hand this to Claude)
+### Step 5 — Register your scheduled tasks (hand this to Claude)
 
 > "Register two durable scheduled tasks for me using the scheduler. Task 1 `apollo-morning-driver`:
 > cron from rep_config morning_cron, prompt = the contents of hopper/MORNING_DRIVER.md with BASE
@@ -80,9 +117,7 @@ Follow `hopper/APOLLO_SETUP.md`:
 > Task 2 `apollo-weekly-digest`: Friday early afternoon, runs `python3 hopper/digest.py` and Slacks
 > me the output. notifyOnCompletion true on both."
 
----
-
-## Step 6 — Bank tool approvals (you, once — critical)
+### Step 6 — Bank tool approvals (you, once — critical)
 
 In Cowork's **Scheduled** panel, find `apollo-morning-driver` and click **Run now** once.
 Approve each tool prompt (Clay, Apollo, Slack) as it appears. Those approvals are stored on the
@@ -97,6 +132,8 @@ runs will silently do nothing** (they can't answer a permission prompt at 7am).
   enroll per account, import that account's `apollo-import.csv`, then activate the sequence.
 - STRIKE accounts wait for your review; NURTURE/QUALIFY are pre-trusted.
 - Friday: you get the weekly digest automatically.
+
+---
 
 ## The files you got (what each does)
 
@@ -113,9 +150,13 @@ runs will silently do nothing** (they can't answer a permission prompt at 7am).
 | `hopper/setup.py` | Scaffolds your workspace and hydrates configs. |
 | `hopper/build_hopper.py` | Scores accounts from JSONL into the hopper. |
 
+---
+
 ## Gotchas (learned the hard way)
 
 - **Run now once** or autonomous runs do nothing (Step 6).
 - **Insert merge variables via the `{ }` picker**, never hand-type `{{...}}`, or emails send literal tokens.
 - **Don't activate** a contact before its import fills the fields, or it sends a blank email.
 - Apollo enrollment + activation always need your explicit confirmation — by design.
+- **Apollo mailbox prerequisite:** If you have not connected a Gmail mailbox inside Apollo, the
+  pipeline cannot send or enroll contacts. Verify this in Apollo Settings → Mailboxes before setup.

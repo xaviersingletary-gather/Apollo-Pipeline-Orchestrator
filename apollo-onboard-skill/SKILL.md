@@ -14,73 +14,229 @@ description: >
 # Apollo Pipeline — One-Command Onboarding
 
 You are setting up the Self-Driving Apollo Pipeline for a new rep who just typed the trigger.
-Do every step you can automatically. Stop and ask only where a human must act. Be brisk; this
-should feel like one flow, not an interview. Confirm each milestone in one line.
+Do every step you can automatically. Stop and ask only where a human must act. Confirm each
+milestone with a clean visual line.
+
+> ⏳ **This setup takes 15–30 minutes** while Claude scores your accounts and wires the config.
+> Most of the time is hands-off. You do not need to babysit the session.
+
+## Prerequisites (must already be satisfied)
+
+Before starting, confirm ALL of the following are true. If any are missing, stop and tell the
+rep exactly what to do:
+
+- ✅ Apollo account with a Gmail mailbox **connected and active** (required for sender identity
+  and sequence enrollment).
+- ✅ `rep_config.json` exists and contains `name`, `email`, and `sequence_id`. This file is either
+  pre-filled by the rep or discovered from a prior session. **This skill does not interview for
+  identity — it reads what is already there.**
+- ✅ The repo "Apollo Pipeline Orchestrator" is accessible in this Cowork session (either added
+  via the **Context** panel or cloned into the user's OUTPUTS).
+
+---
 
 ## Step 0 — Locate the toolkit
+
 Find the orchestrator folder: search the user's OUTPUTS for `Apollo Pipeline Orchestrator/hopper/gate.py`.
-Set BASE = that folder. If you cannot find it, tell the rep to copy the "Apollo Pipeline
-Orchestrator" folder into their Cowork OUTPUTS first, then re-run. All paths below are under BASE.
+Set `BASE` = that folder.
+
+**If not found:**
+```
+❌ STEP 0 — Toolkit not found
+
+The repo must be in your Cowork context to run setup.
+Fix: Add "Apollo Pipeline Orchestrator" to your Context panel (or clone it into OUTPUTS),
+then re-trigger this skill.
+```
+
+**If found:**
+```
+✅ STEP 0 — Toolkit located at <BASE>
+```
+
+All paths below are under `BASE`.
+
+---
 
 ## Step 1 — Scaffold (automatic)
-Run: `python3 "$BASE/hopper/setup.py"`. This creates state/, runs/, an empty hopper, and
-rep_config.json. Report the one-line result.
 
-## Step 2 — Identity (automatic, with one quick ask)
-Ask the rep once, in a single message: their full name, work email, and whether they already have
-an Apollo sequence for this (name) or want one created.
-Then, without further prompting:
-- Slack ID: `slack_search_users` on their name -> capture the U******** id.
-- Apollo sender mailbox: `apollo_email_accounts_index` -> their Gmail mailbox id (confirm if >1).
-- Sequence: `apollo_emailer_campaigns_search` by the name they gave. If none, offer to create one
-  with `apollo_sequences_create` using the standard cadence (day-1 manual email + call + LinkedIn
-  connection, day-3 call, day-5 LinkedIn video, day-7 email, day-8 call) and the four
-  Gather_* merge variables. Capture the sequence id + name.
-Write all of this into `$BASE/hopper/rep_config.json`, and mirror sequence_id, sequence_name, and
-sender_email_account_id into `$BASE/hopper/apollo_config.json`. Confirm the IDs you wrote.
+Run: `python3 "$BASE/hopper/setup.py"`
 
-## Step 3 — Build the hopper (automatic, needs their account list)
-Ask the rep to paste their assigned accounts (names, or account,domain). For each, run the
-`account-scoring` skill (Fit x Signal). Write `$BASE/hopper/hopper.jsonl`, one JSON object per line,
-ranked best-first, schema:
+**Expected output:**
+```
+✅ STEP 1 — Workspace scaffolded
+   Created: state/
+   Created: runs/
+   Created: rep_config.json
+   Created: apollo_config.json
+```
+
+---
+
+## Step 2 — Identity (automatic — read only)
+
+Open `$BASE/hopper/rep_config.json`. Do not ask the rep for name, email, or sequence — these
+must already be present.
+
+**If any required field is missing (`name`, `email`, or `sequence_id`):**
+```
+❌ STEP 2 — Missing required identity fields
+
+Your rep_config.json is missing required fields. Please fill:
+  • name
+  • email
+  • sequence_id
+
+Then re-trigger this skill.
+```
+
+**If all fields are present, resolve the live IDs and write back:**
+- Slack ID: `slack_search_users` on `name` → capture `U********`
+- Apollo sender mailbox: `apollo_email_accounts_index` → capture Gmail mailbox id
+- Sequence: `apollo_emailer_campaigns_search` by `sequence_id` or name → confirm id + name
+
+Mirror `sequence_id`, `sequence_name`, and `sender_email_account_id` into
+`$BASE/hopper/apollo_config.json`.
+
+**Expected output:**
+```
+✅ STEP 2 — Identity resolved
+   Slack user_id:     U********
+   Apollo mailbox id:  <mailbox_id>
+   Sequence id:       <sequence_id>
+   Sequence name:     <sequence_name>
+```
+
+---
+
+## Step 3 — Build the hopper (automatic)
+
+The rep must have already provided their account list (via context, paste, or prior message).
+For each account, run the `account-scoring` skill (Fit × Signal).
+
+Write `$BASE/hopper/hopper.jsonl`, one JSON object per line, ranked best-first, schema:
+```json
 {rank, account, domain, verdict, fit, signal, confidence, top_move, status:"todo",
-last_worked_at:null, sequence_target:null, scored_at:"<today>"}.
-Verdict: STRIKE = Fit>=70 and Signal>=70; NURTURE = Fit>=70, Signal<70; QUALIFY = Fit 40-69;
-KILL = either <40. Then run `python3 "$BASE/hopper/gate.py" status` and show the ranked queue.
+ last_worked_at:null, sequence_target:null, scored_at:"<today>"}
+```
 
-## Step 4 — Apollo field wiring (HUMAN STEP — guide, do not automate)
-The Apollo MCP cannot create custom fields or run the CSV import. Tell the rep to do this once in
-the Apollo UI, and wait for them to confirm before continuing:
-1. Settings -> Custom Fields (object: Contacts). Create: Gather_Email_Subject, Gather_Email_Body,
-   Gather_Script, Gather_Connection_Note (Text).
-2. In their sequence, set the day-1 email Subject and Body to those variables using the { } picker
-   (never hand-type the token), and reference Gather_Script / Gather_Connection_Note on the call
-   and LinkedIn steps.
-Point them to `$BASE/hopper/APOLLO_SETUP.md` for the exact clicks. Note: per run they import that
-day's apollo-import.csv, matching on Email.
+**Verdict rules:**
+- STRIKE = Fit ≥70 and Signal ≥70
+- NURTURE = Fit ≥70, Signal <70
+- QUALIFY = Fit 40–69
+- KILL = either <40
 
-## Step 5 — Register the scheduled tasks (automatic)
+Then run `python3 "$BASE/hopper/gate.py" status`.
+
+**Expected output:**
+```
+✅ STEP 3 — Hopper built
+   Accounts scored:    <N>
+   STRIKE:             <N>
+   NURTURE:            <N>
+   QUALIFY:            <N>
+   KILL:               <N>
+   Ranked queue ready. Top account: <top_account>
+```
+
+---
+
+## Step 4 — Apollo field wiring (HUMAN STEP — guide only)
+
+The Apollo MCP cannot create custom fields or run the CSV import. Tell the rep to do this **once**
+in the Apollo web UI. Wait for them to confirm before continuing.
+
+**Exact instructions:**
+1. Open Apollo → **Settings** → **Custom Fields** → Object = **Contacts**
+2. Create these 4 fields, type = **Text**:
+   - `Gather_Email_Subject`
+   - `Gather_Email_Body`
+   - `Gather_Script`
+   - `Gather_Connection_Note`
+3. Open your sequence → edit the **day-1 email step**
+   - Click into the **Subject** field → use the **{ }** picker → select `Gather_Email_Subject`
+   - Click into the **Body** field → use the **{ }** picker → select `Gather_Email_Body`
+   - **Never hand-type the token** — always use the picker.
+4. In the same sequence, edit the **call step** → reference `Gather_Script` via the picker.
+5. Edit the **LinkedIn connection step** → reference `Gather_Connection_Note` via the picker.
+
+Point them to `$BASE/hopper/APOLLO_SETUP.md` for screenshots. Note: per run they import that
+day's `apollo-import.csv`, matching on Email.
+
+**Expected output (after rep confirms):**
+```
+✅ STEP 4 — Apollo fields wired (human confirmed)
+   Custom fields created and sequence template set.
+```
+
+---
+
+## Step 5 — Register scheduled tasks (automatic)
+
 Register two durable scheduled tasks via the scheduler:
-- `apollo-morning-driver`: cron = rep_config.morning_cron; prompt = the full contents of
-  `$BASE/hopper/MORNING_DRIVER.md` with BASE set to the absolute path and the Slack DM target set
-  to rep_config.slack_user_id; notifyOnCompletion true.
-- `apollo-weekly-digest`: Friday early afternoon; prompt = run `python3 "$BASE/hopper/digest.py"`
-  and Slack the output to rep_config.slack_user_id; notifyOnCompletion true.
-Confirm both registered with their next run times.
+
+- `apollo-morning-driver`
+  - cron = `rep_config.morning_cron`
+  - prompt = full contents of `$BASE/hopper/MORNING_DRIVER.md` with `BASE` set to the absolute path
+    and Slack DM target set to `rep_config.slack_user_id`
+  - `notifyOnCompletion` = true
+
+- `apollo-weekly-digest`
+  - Friday early afternoon
+  - prompt = run `python3 "$BASE/hopper/digest.py"` and Slack the output to `rep_config.slack_user_id`
+  - `notifyOnCompletion` = true
+
+**Expected output:**
+```
+✅ STEP 5 — Scheduled tasks registered
+   apollo-morning-driver   → next run: <time>
+   apollo-weekly-digest    → next run: <time>
+```
+
+---
 
 ## Step 6 — Bank approvals (HUMAN STEP — instruct clearly)
-Tell the rep: open Cowork's Scheduled panel, find apollo-morning-driver, click Run now once, and
-approve each tool prompt (Clay, Apollo, Slack). Explain plainly: skip this and the automated 7am
-runs fire but do nothing, because an unattended run cannot answer a permission prompt. Offer to
-watch for the next run and confirm it produced a Slack report + run log.
 
-## Close
-Summarize in one screen: what is now automatic (account pick, research, sourcing, enrichment,
-content, contact creation, staging, reporting, weekly digest) and the only human touches left
-(the Apollo field wiring done once, the Run-now click once, then per-account enroll confirm +
-the bespoke sends). Voice rules apply to anything you draft: no em dashes, no AI tells.
+Tell the rep:
+
+> Open Cowork's **Scheduled** panel, find `apollo-morning-driver`, click **Run now** once, and
+> approve each tool prompt (Clay, Apollo, Slack) as it appears.
+
+Explain plainly: skip this and the automated 7am runs fire but do nothing, because an unattended
+run cannot answer a permission prompt.
+
+**Expected output (after rep confirms):**
+```
+✅ STEP 6 — Tool approvals banked (human confirmed)
+   Clay, Apollo, and Slack prompts approved once.
+   Future 7am runs will fire unattended.
+```
+
+---
+
+## Close — Setup Summary
+
+```
+🎯 Setup complete. Here is what is now automatic:
+
+✅ Account pick      — top-scored account pulled from hopper each morning
+✅ Research          — Clay finds VP/Director+ contacts + enriches emails
+✅ Content           — bespoke email, call script, LinkedIn note per contact
+✅ Staging           — contacts written to apollo-import.csv
+✅ Reporting         — Slack DM with staged batch summary
+✅ Weekly digest     — Friday rollup of runs, enrollments, replies, hopper depth
+
+🖐️ Human touches remaining:
+   • Apollo field wiring    → done once (Step 4)
+   • Run-now approval       → done once (Step 6)
+   • Per-account enroll     → you review and confirm before send
+   • Bespoke sends          → calls, LinkedIn videos, manual emails
+```
+
+---
 
 ## Guardrails
+
 - Never run the Apollo add-to-sequence or activate tools during onboarding. Onboarding only sets
   up; sending happens later, gated by the rep.
 - Do not invent IDs. Every Slack/Apollo id must come from a live tool call in this session.

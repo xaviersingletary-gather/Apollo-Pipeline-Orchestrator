@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day One Playbook — What Happens Tomorrow Morning</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --java: #14E2AC;
+  --mineral: #38544A;
+  --surface: #F5F6F7;
+  --ink: #1A1A1C;
+  --white: #FFFFFF;
+  --muted: #6B7280;
+  --light-border: #E5E7EB;
+  --slack-bg: #1A1D21;
+  --slack-sidebar: #19171D;
+  --slack-green: #2BAC76;
+  --slack-blue: #36C5F0;
+  --slack-red: #E01E5A;
+  --apollo-purple: #6366F1;
+  --apollo-bg: #F8FAFC;
+  --warning: #F59E0B;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  line-height: 1.55;
+}
+.brand-bar { height: 6px; background: var(--java); }
+header {
+  background: var(--ink);
+  color: var(--white);
+  padding: 36px 40px 28px;
+}
+header h1 { margin: 0 0 6px; font-size: 28px; font-weight: 700; letter-spacing: -0.3px; }
+header .subtitle { margin: 0; color: #A3A3A3; font-size: 15px; font-weight: 400; }
+header .tagline { margin: 12px 0 0; color: var(--java); font-size: 14px; font-weight: 600; letter-spacing: 0.2px; text-transform: uppercase; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 32px 40px 60px; }
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-desc { font-size: 14px; color: var(--muted); margin: 0 0 24px; }
+
+/* Step blocks */
+.step-block {
+  background: var(--white);
+  border: 1px solid var(--light-border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.step-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--java);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.step-title { font-size: 17px; font-weight: 600; margin: 0; }
+.step-time { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: auto; }
+
+/* Slack mockup */
+.slack-mockup {
+  background: var(--slack-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #D1D2D3;
+}
+.slack-header {
+  background: var(--slack-sidebar);
+  padding: 14px 18px;
+  border-bottom: 1px solid #2C2D30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slack-channel-icon {
+  width: 22px; height: 22px;
+  background: var(--slack-green);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; font-weight: 700;
+}
+.slack-channel-name { color: #fff; font-weight: 600; font-size: 15px; }
+.slack-body { padding: 16px 18px; }
+.slack-msg {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.slack-avatar {
+  width: 36px; height: 36px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #14E2AC 0%, #38544A 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700;
+  flex-shrink: 0;
+}
+.slack-avatar.bot { background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%); }
+.slack-content { flex: 1; }
+.slack-meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+.slack-name { color: #fff; font-weight: 700; font-size: 14px; }
+.slack-badge {
+  background: #2BAC76;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.slack-time { color: #6F6F6F; font-size: 12px; }
+.slack-text { color: #D1D2D3; }
+.slack-text p { margin: 0 0 6px; }
+.slack-text p:last-child { margin-bottom: 0; }
+.slack-divider {
+  border-top: 1px solid #2C2D30;
+  margin: 14px 0;
+}
+.slack-attachment {
+  background: #222529;
+  border-left: 4px solid var(--java);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+.slack-attachment-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.slack-attachment-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+}
+.slack-attachment-row span:first-child { color: #9A9B9C; }
+.slack-attachment-row span:last-child { color: #fff; font-weight: 500; }
+.slack-code {
+  background: #1A1D21;
+  border: 1px solid #2C2D30;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 12px;
+  color: #14E2AC;
+  margin-top: 8px;
+}
+.slack-reply-box {
+  border-top: 1px solid #2C2D30;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slack-reply-input {
+  background: #222529;
+  border: 1px solid #2C2D30;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #9A9B9C;
+  font-size: 13px;
+  flex: 1;
+}
+
+/* Apollo mockup */
+.apollo-mockup {
+  background: var(--apollo-bg);
+  border: 1px solid var(--light-border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+.apollo-header {
+  background: var(--white);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--light-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.apollo-logo {
+  width: 28px; height: 28px;
+  background: var(--apollo-purple);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; font-weight: 700;
+}
+.apollo-nav { color: var(--muted); font-size: 13px; }
+.apollo-nav span { color: var(--ink); font-weight: 600; }
+.apollo-body { padding: 20px; }
+.apollo-card {
+  background: var(--white);
+  border: 1px solid var(--light-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.apollo-card h4 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.apollo-btn {
+  display: inline-block;
+  background: var(--apollo-purple);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-right: 8px;
+}
+.apollo-btn-outline {
+  display: inline-block;
+  background: var(--white);
+  color: var(--muted);
+  border: 1px solid var(--light-border);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 13px;
+}
+.apollo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.apollo-table th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--light-border);
+  color: var(--muted);
+  font-weight: 500;
+}
+.apollo-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--light-border);
+  color: var(--ink);
+}
+.apollo-table tr:last-child td { border-bottom: none; }
+.apollo-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-paused { background: #FEF3C7; color: #92400E; }
+.status-active { background: #D1FAE5; color: #065F46; }
+.status-staged { background: #E0E7FF; color: #3730A3; }
+
+/* Instruction callouts */
+.callout {
+  background: #F0FDF4;
+  border-left: 4px solid var(--java);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.callout strong { color: var(--mineral); }
+.callout-warning {
+  background: #FFFBEB;
+  border-left-color: #F59E0B;
+}
+.callout-danger {
+  background: #FEF2F2;
+  border-left-color: #EF4444;
+}
+.callout code {
+  background: #1A1A1C;
+  color: var(--java);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+.callout .disclaimer {
+  font-size: 12px;
+  color: #92400E;
+  font-style: italic;
+}
+
+/* Mini preview */
+.preview-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 800px) {
+  .preview-row { grid-template-columns: 1fr; }
+  .wrap { padding: 20px; }
+}
+
+/* Footer */
+footer { text-align: center; padding: 32px 20px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+<header>
+  <div class="tagline">Day One Playbook</div>
+  <h1>What Happens Tomorrow Morning</h1>
+  <p class="subtitle">Exact format of what you see in Slack, based on the canonical Morning Driver prompt.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- STEP 1 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">You wake up. Check Slack.</div>
+      </div>
+      <div class="step-time">~07:15 AM</div>
+    </div>
+    <p class="section-desc">You do not open Apollo, Clay, or any spreadsheet. You open Slack. A DM from the Apollo Pipeline bot is waiting.</p>
+
+    <div class="slack-mockup">
+      <div class="slack-header">
+        <div class="slack-channel-icon">#</div>
+        <div class="slack-channel-name">direct messages</div>
+      </div>
+      <div class="slack-body">
+        <div class="slack-msg">
+          <div class="slack-avatar bot">A</div>
+          <div class="slack-content">
+            <div class="slack-meta">
+              <span class="slack-name">Apollo Pipeline</span>
+              <span class="slack-badge">app</span>
+              <span class="slack-time">7:15 AM</span>
+            </div>
+            <div class="slack-text">
+              <p><strong>Apollo morning run — 2026-06-16</strong></p>
+              <p>6 contacts across 1 account(s) (target 20)</p>
+              <p>- DHL Supply Chain (STRIKE 90/78): 6 contacts, staged for approval</p>
+              <p>Confirm enroll: enroll DHL</p>
+              <p>Queue: 8 todo left</p>
+              <p>Run logs + CSVs: /Users/.../Apollo Pipeline Orchestrator/runs/ and per-account folders</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slack-reply-box">
+        <div class="slack-reply-input">Message Apollo Pipeline</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Where to go:</strong> Slack DM with "Apollo Pipeline" bot. Not a channel — a direct message.
+      <br><strong>What you get:</strong> One plain-text message per run, listing accounts worked, contact counts, verdicts, and the confirm instruction.
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">You review the run log (STRIKE only)</div>
+      </div>
+      <div class="step-time">~07:18 AM</div>
+    </div>
+    <p class="section-desc">For STRIKE accounts, read the personalized content before confirming. For NURTURE/QUALIFY, you can skip straight to enrollment.</p>
+
+    <div class="callout callout-warning">
+      <strong>STRIKE rule:</strong> Fit >=70 + Signal >=70. These are your top logos. The system requires your eyes on the email and script before it ships.
+      <br><strong>NURTURE/QUALIFY rule:</strong> Pre-trusted. Rubber-stamp enroll. No review needed.
+    </div>
+
+    <p style="font-size:14px; color:var(--muted); margin: 16px 0 8px;">The run log lives in the repo:</p>
+    <div class="callout" style="background:#1A1A1C; border-left-color:#14E2AC;">
+      <code>runs/2026-06-16-DHL-run.md</code>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin: 8px 0;">It contains per-contact breakdowns: email subject, body, call script, and LinkedIn connection note. You can open it in any markdown viewer or in VS Code.</p>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">You confirm enrollment in an interactive Claude session</div>
+      </div>
+      <div class="step-time">~09:00 AM</div>
+    </div>
+    <p class="section-desc">This is not a Slack bot command. You open a fresh Claude session and say "enroll DHL" (or "approve DHL"). Claude then calls the Apollo MCP tools directly — adding contacts to the sequence and logging them to the watcher state.</p>
+
+    <div class="callout">
+      <strong>What happens behind the scenes:</strong> Claude calls <code>apollo_emailer_campaigns_search</code>, <code>apollo_email_accounts_index</code>, then <code>apollo_emailer_campaigns_add_contact_ids</code> with status <strong>paused</strong> (STRIKE) or <strong>active</strong> (NURTURE/QUALIFY). It also writes each contact to <code>state/active-contacts.jsonl</code> for the reply watcher.
+    </div>
+
+    <p style="font-size:14px; color:var(--muted); margin: 16px 0 8px;">Example output from <code>gate.py approve</code> after Claude does the MCP work:</p>
+    <div class="callout" style="background:#1A1A1C; border-left-color:#14E2AC;">
+      <code>APPROVED + ENROLLED DHL (6 contacts). Mode=csv. Upload CSV to Apollo: runs/2026-06-16 DHL/apollo-import.csv</code>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">You import the CSV into Apollo</div>
+      </div>
+      <div class="step-time">~09:05 AM</div>
+    </div>
+    <p class="section-desc">This is the only UI step. You import the generated CSV so Apollo maps per-contact custom fields (email body, script, connection note) onto each contact.</p>
+
+    <div class="callout callout-warning">
+      <strong>Disclaimer:</strong> The screenshots below are <em>illustrative mockups</em> based on the technical spec, not live screenshots from Apollo's actual UI. Apollo's import interface may look different. The workflow (upload CSV, match on Email, map custom fields, activate) is correct per the spec.
+    </div>
+
+    <div class="apollo-mockup">
+      <div class="apollo-header">
+        <div class="apollo-logo">A</div>
+        <div class="apollo-nav">Sequences / <span>Gather Outbound Q2</span> / Import Contacts</div>
+      </div>
+      <div class="apollo-body">
+        <div class="apollo-card">
+          <h4>Import Contacts from CSV</h4>
+          <div style="border: 2px dashed #CBD5E1; border-radius: 8px; padding: 28px; text-align: center; margin-bottom: 14px;">
+            <div style="font-size: 28px; margin-bottom: 8px;">&#x1F4C4;</div>
+            <div style="color: var(--muted); font-size: 13px;">Drag and drop or click to upload</div>
+            <div style="color: #94A3B8; font-size: 12px; margin-top: 4px;"><code>runs/2026-06-16-DHL/apollo-import.csv</code></div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <span class="apollo-btn">Upload CSV</span>
+            <span class="apollo-btn-outline">Cancel</span>
+          </div>
+        </div>
+
+        <div class="apollo-card">
+          <h4>Field Mapping Preview</h4>
+          <table class="apollo-table">
+            <tr>
+              <th>CSV Header</th>
+              <th>Mapped To</th>
+              <th>Sample Value</th>
+            </tr>
+            <tr>
+              <td><code>email</code></td>
+              <td>Email Address</td>
+              <td>john.doe@dhl.com</td>
+            </tr>
+            <tr>
+              <td><code>first_name</code></td>
+              <td>First Name</td>
+              <td>John</td>
+            </tr>
+            <tr>
+              <td><code>Gather_Email_Subject</code></td>
+              <td>Custom Field: Gather_Email_Subject</td>
+              <td>Reducing shrinkage at DHL Fulfillment...</td>
+            </tr>
+            <tr>
+              <td><code>Gather_Email_Body</code></td>
+              <td>Custom Field: Gather_Email_Body</td>
+              <td>Hi John, saw the expansion in Chicago...</td>
+            </tr>
+            <tr>
+              <td><code>Gather_Script</code></td>
+              <td>Custom Field: Gather_Script</td>
+              <td>"Hey John, 30 seconds. We're Gather AI..."</td>
+            </tr>
+            <tr>
+              <td><code>Gather_Connection_Note</code></td>
+              <td>Custom Field: Gather_Connection_Note</td>
+              <td>Hi John — saw your work on...</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-danger">
+      <strong>Guard:</strong> Do NOT activate the sequence before importing. If you unpause first, Apollo sends a blank template because the custom fields are empty.
+      <br><strong>Rule:</strong> Import &rarr; Match on Email &rarr; Verify mappings &rarr; Activate.
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">You activate the sequence in Apollo</div>
+      </div>
+      <div class="step-time">~09:08 AM</div>
+    </div>
+    <p class="section-desc">After import, the sequence is still paused (STRIKE). You unpause it. NURTURE/QUALIFY sequences are already active from the enroll step.</p>
+
+    <div class="apollo-mockup" style="max-width: 600px;">
+      <div class="apollo-header">
+        <div class="apollo-logo">A</div>
+        <div class="apollo-nav">Sequences / <span>Gather Outbound Q2</span></div>
+      </div>
+      <div class="apollo-body">
+        <div class="apollo-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h4 style="margin:0;">Gather Outbound Q2</h4>
+            <span class="apollo-status status-paused">Paused</span>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <span class="apollo-btn">&#x25B6; Activate</span>
+            <span class="apollo-btn-outline">Edit</span>
+          </div>
+          <p style="margin: 14px 0 0; color: var(--muted); font-size: 12px;">
+            6 contacts loaded. 0 emails sent. First step: manual_email (Day 1).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>What happens now:</strong> Apollo queues the 8-day cadence. Day 1 email is a <code>manual_email</code> step — it queues but does not send yet. Days 3, 5, 7, 8 run automatically after you send Day 1.
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">You send the Day 1 email manually</div>
+      </div>
+      <div class="step-time">~09:10 AM</div>
+    </div>
+    <p class="section-desc">This is intentional. The first email is the human handshake. Apollo pre-fills the subject and body from the custom fields you imported.</p>
+
+    <div class="apollo-mockup" style="max-width: 640px;">
+      <div class="apollo-header">
+        <div class="apollo-logo">A</div>
+        <div class="apollo-nav">Outbox / <span>Manual Emails</span></div>
+      </div>
+      <div class="apollo-body">
+        <div class="apollo-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div>
+              <div style="font-weight: 600; color: var(--ink); margin-bottom: 4px;">John Doe — DHL Supply Chain</div>
+              <div style="color: var(--muted); font-size: 12px;">john.doe@dhl.com</div>
+            </div>
+            <span class="apollo-status status-staged">Ready to send</span>
+          </div>
+          <div style="background: var(--apollo-bg); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+            <div style="font-weight: 600; font-size: 12px; margin-bottom: 6px; color: var(--ink);">Subject:</div>
+            <div style="font-size: 13px; color: var(--ink); margin-bottom: 10px;">Reducing shrinkage at DHL Fulfillment — 30 sec?</div>
+            <div style="font-weight: 600; font-size: 12px; margin-bottom: 6px; color: var(--ink);">Body:</div>
+            <div style="font-size: 13px; color: var(--ink); line-height: 1.6;">
+              Hi John,<br><br>
+              Saw DHL's new fulfillment expansion in Chicago. Quick question — how are you handling inventory shrinkage across that footprint?<br><br>
+              We're Gather AI. We use autonomous drones to cycle-count warehouse inventory in 1/10th the time. Reduces shrinkage by up to 60%.<br><br>
+              Worth a 30-second conversation?<br><br>
+              Best,<br>
+              Xavier Singletary
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <span class="apollo-btn">Send Email</span>
+            <span class="apollo-btn-outline">Edit</span>
+            <span class="apollo-btn-outline">Skip</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Why manual?</strong> The first email is the human handshake. Apollo pulls the subject and body from the custom fields you imported. You review, you send. Everything after this is automated.
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div>
+        <div class="step-title">System watches for replies all day</div>
+      </div>
+      <div class="step-time">Every 15 min</div>
+    </div>
+    <p class="section-desc">You do nothing. The response watcher polls Gmail, classifies replies, and pings you in Slack when something real lands.</p>
+
+    <div class="slack-mockup" style="max-width: 520px;">
+      <div class="slack-body">
+        <div class="slack-msg">
+          <div class="slack-avatar bot">A</div>
+          <div class="slack-content">
+            <div class="slack-meta">
+              <span class="slack-name">Apollo Pipeline</span>
+              <span class="slack-badge">app</span>
+              <span class="slack-time">2:47 PM</span>
+            </div>
+            <div class="slack-text">
+              <p>&#x1F514; <strong>Response from John Doe at DHL Supply Chain</strong></p>
+              <div class="slack-attachment">
+                <div class="slack-attachment-title">&#x1F7E0; Real Reply</div>
+                <div class="slack-attachment-row"><span>Classification</span> <span style="color:#14E2AC;font-weight:700;">real (interested)</span></div>
+                <div class="slack-attachment-row"><span>Lead Band</span> <span>78 / 100</span></div>
+                <div class="slack-attachment-row"><span>Handoff Doc</span> <span><code>../Lead Workflow/John-Doe-DHL-Handover.docx</code></span></div>
+              </div>
+              <p style="margin-top:8px;"><strong>Action:</strong> Follow up within 24 hours. Call script and objection map are in the handoff doc.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-warning">
+      <strong>Classifications:</strong> <code>real</code> (auto-scored, handoff doc created), <code>ooo</code> (Slack DM with return date if detectable), <code>wrong_person</code> (Slack DM asking for redirect guidance). Ambiguous replies default to <code>real</code>.
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <div>
+        <div class="step-title">Friday: Weekly Digest arrives</div>
+      </div>
+      <div class="step-time">~4:00 PM Friday</div>
+    </div>
+    <p class="section-desc">One rollup message. Accounts worked, contacts enrolled, replies by type, hopper depth. If unworked accounts drop below 3, a REPLENISH flag fires.</p>
+
+    <div class="slack-mockup" style="max-width: 520px;">
+      <div class="slack-body">
+        <div class="slack-msg">
+          <div class="slack-avatar bot">A</div>
+          <div class="slack-content">
+            <div class="slack-meta">
+              <span class="slack-name">Apollo Pipeline</span>
+              <span class="slack-badge">app</span>
+              <span class="slack-time">4:02 PM</span>
+            </div>
+            <div class="slack-text">
+              <p>&#x1F4CA; <strong>Weekly Digest</strong> — June 9-13</p>
+              <p>Runs fired: 5</p>
+              <p>Contacts enrolled: 28</p>
+              <p>Replies this week: 8 (real 3, OOO 4, wrong-person 1)</p>
+              <p>Hopper: 2 todo left</p>
+              <p style="color:#F59E0B; font-weight:600; margin-top:8px;">&#x26A0; REPLENISH: low, re-score soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary card -->
+  <div class="step-block" style="background: linear-gradient(135deg, var(--mineral) 0%, var(--ink) 100%); color: var(--white); border: none;">
+    <div class="step-header">
+      <div class="step-num" style="background: var(--java); color: var(--ink);">&#x2713;</div>
+      <div>
+        <div class="step-title" style="color: var(--white);">The Whole Thing in 3 Taps</div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 8px;">
+      <div style="background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <div style="font-size: 24px; margin-bottom: 6px;">&#x1F4AC;</div>
+        <div style="font-weight: 600; margin-bottom: 4px;">Tap 1</div>
+        <div style="font-size: 13px; color: #B0B8C4;">Read Slack report. Review STRIKE content if needed.</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <div style="font-size: 24px; margin-bottom: 6px;">&#x2705;</div>
+        <div style="font-weight: 600; margin-bottom: 4px;">Tap 2</div>
+        <div style="font-size: 13px; color: #B0B8C4;">Open Claude session and say "enroll [account]".</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px;">
+        <div style="font-size: 24px; margin-bottom: 6px;">&#x1F680;</div>
+        <div style="font-weight: 600; margin-bottom: 4px;">Tap 3</div>
+        <div style="font-size: 13px; color: #B0B8C4;">Import CSV + Activate in Apollo. Send Day 1 email.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Built by Peter Tosh at Gather AI &middot; Apollo Pipeline Orchestrator &middot; June 2026
+</footer>
+
+</body>
+</html>

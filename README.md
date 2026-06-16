@@ -22,6 +22,50 @@ Built by Peter Tosh at Gather AI, June 2026.
 
 ---
 
+## How It Works
+
+1. **Monday morning pick.** The system locks the top-scored account from your ranked hopper.
+2. **Research.** It reads the account domain, news, and any notes you have on the company.
+3. **Find 20 contacts.** Clay sources VP/Director+ ICP contacts with verified work emails.
+4. **Write personalized content.** Every contact gets a bespoke email, call script, and LinkedIn note based on their role and the account's context.
+5. **Stage in Apollo.** Contacts are loaded into a sequence with custom fields populated via CSV.
+6. **Slack report.** You get a DM with the batch summary, ready for review.
+7. **Rep reviews and confirms.** You check the work, hit enroll, and activate. The Response Watcher polls Gmail for replies, classifies them, and Slacks you the results. Friday brings a Weekly Digest rollup.
+
+---
+
+## Team Onboarding
+
+The fastest way to get running is to let Claude handle the wiring. Add this repo to Cowork context, connect your tools, and send one command.
+
+**Repo:** https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator
+
+### PRE-FLIGHT CHECKLIST
+
+Do not skip these. The setup will fail without them.
+
+- [ ] **Apollo account with a connected Gmail mailbox** (hard prerequisite — sequences send from this mailbox)
+- [ ] **Cowork connected to:** Apollo, Slack, Gmail, Clay
+- [ ] **Target account list ready** (company names, domains, any notes)
+- [ ] **20–30 minutes free** (you will be approving tool prompts)
+
+### Fast path (recommended)
+
+⏱ **Time expectation: 15–30 minutes.** Most of it is waiting and clicking "Always allow."
+
+1. **Connect your apps.** In Cowork settings, add Apollo, Slack, Gmail, and Clay as available tools.
+2. **Add the repo to Cowork context.** Paste the repo link above into the session **and add it to Cowork context** — do not just drop a link in chat. You can also drag the local folder into the session.
+3. **Send one command:**
+
+   > `run apollo setup`
+
+4. **Wait and approve.** Claude will scaffold your workspace and hydrate your configs. Click **Always allow** on every tool prompt. After setup finishes, go to the Scheduled panel, click **Run now** once on `apollo-morning-driver`, and **Always allow** again. This banks every approval needed for unattended morning runs — future runs need zero interaction.
+5. **One-time Apollo UI step.** Create the four custom fields in Apollo and wire them into your sequence template per `hopper/APOLLO_SETUP.md`. Claude will remind you. (5 minutes.)
+
+That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.
+
+---
+
 ## What It Does
 
 | Phase | What Happens |
@@ -30,32 +74,6 @@ Built by Peter Tosh at Gather AI, June 2026.
 | **Operator Confirm** | Rep reviews, confirms enroll, imports `apollo-import.csv`, activates sequence |
 | **Response Watcher (15 min)** | Polls Gmail for replies, classifies (real / OOO / wrong-person), auto-scores real replies, Slacks rep |
 | **Weekly Digest** | Friday rollup of runs, enrollments, replies, hopper depth |
-
----
-
-## Team Onboarding
-
-The fastest way to get running is to let Claude handle the wiring. Paste the repo into a Cowork session, connect your tools, and hand over your account list.
-
-### Fast path (recommended)
-
-**Repo link:** https://github.com/xaviersingletary-gather/Apollo-Pipeline-Orchestrator — copy this and paste it into Claude Cowork.
-
-1. **Open Claude Cowork.** Paste the repo contents into the session.
-2. **Connect your stack.** Add Apollo, Slack, Gmail, and Clay as available tools.
-3. **Hand Claude your account list.** Paste your target accounts (names, domains, any notes you have).
-4. **Tell Claude:**
-
-   > "Set up the Apollo Pipeline Orchestrator for me. Fill my rep identity and Apollo config, score these accounts into a hopper, and register the morning driver and weekly digest scheduled tasks."
-
-5. **One-time Apollo UI step.** Create the four custom fields in Apollo and wire them into your sequence template per `hopper/APOLLO_SETUP.md`. Claude will remind you.
-6. **Bank approvals.** Click **Run now** once on the `apollo-morning-driver` task in the Scheduled panel. Approve the tool prompts. Every future run is unattended.
-
-That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.
-
-### Manual path
-
-If you prefer to run commands yourself or need to debug, the full CLI walkthrough is in `TEAM-SETUP.md`. Most reps never need it.
 
 ---
 
@@ -167,3 +185,9 @@ Apollo Pipeline Orchestrator/
 - Repo cleaned for team cloning — no PII or machine-specific paths committed
 
 Port to any rep's patch by cloning, running setup, and filling identity.
+
+---
+
+## Manual path (if you prefer CLI)
+
+If you prefer to run commands yourself or need to debug, the full CLI walkthrough is in `TEAM-SETUP.md`. Most reps never need it.
