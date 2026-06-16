@@ -586,7 +586,7 @@ footer {
         <strong>Tell Claude:</strong> "Set up the Apollo Pipeline Orchestrator for me. Fill my rep identity and Apollo config, score these accounts into a hopper, and register the morning driver and weekly digest scheduled tasks."
       </li>
       <li>
-        <strong>One-time Apollo UI step.</strong> Create the four custom fields in Apollo and wire them into your sequence template per <code>hopper/APOLLO_SETUP.md</code>. Claude will remind you.
+        <strong>One-time Apollo UI step.</strong> Wire the four Gather custom fields into your sequence template per <code>hopper/APOLLO_SETUP.md</code>. These already exist — you pick them from the <code>{ }</code> picker. Claude will guide you through every click.
       </li>
       <li>
         <strong>Bank approvals.</strong> Click <strong>Run now</strong> once on the <code>apollo-morning-driver</code> task in the Scheduled panel. Approve the tool prompts. Every future run is unattended.
@@ -724,34 +724,51 @@ footer {
   <!-- Apollo One-Time Setup -->
   <section class="section" id="apollo-setup">
     <h2>Apollo One-Time Setup</h2>
-    <p>Apollo custom fields and sequence wiring are done once in the Apollo UI. After that, each run is a 1-minute CSV import.</p>
+    <p>The 4 Gather custom fields already exist in the workspace. You only wire them into YOUR sequence template once. After that, each run is a 1-minute CSV import.</p>
 
-    <h3>Step 1 — Create 4 Custom Fields (~3 min)</h3>
+    <div class="callout" style="background:#FEF9E7; border-left-color:#F59E0B; margin: 16px 0;">
+      <p><strong>You do NOT create custom fields.</strong> They were created once for all reps. You pick them from the <code>{ }</code> picker and drop them into your sequence. If you cannot find them in the picker, something is wrong — ask for help.</p>
+    </div>
+
+    <h3>Step 1 — Open YOUR Sequence (~1 min)</h3>
     <ol style="color: var(--muted); font-size: 13px; padding-left: 20px; margin-bottom: 16px;">
-      <li>Top-right gear icon &rarr; <strong>Settings</strong></li>
-      <li>Left nav &rarr; <strong>Custom Fields</strong> (under Data / General)</li>
-      <li>Make sure object selector is <strong>Contacts/People</strong></li>
-      <li>Click <strong>+ Add Custom Field</strong> for each:</li>
+      <li>Apollo left nav &rarr; <strong>Engage</strong> &rarr; <strong>Sequences</strong></li>
+      <li>Find and click YOUR target sequence (e.g. "Gather Outbound Q2")</li>
+      <li>Click the <strong>Steps</strong> tab</li>
     </ol>
-    <table>
-      <tr><th>Field Name (type exactly)</th><th>Holds</th><th>Type</th></tr>
-      <tr><td><code>Gather_Email_Subject</code></td><td>Day-1 email subject</td><td>Text</td></tr>
-      <tr><td><code>Gather_Email_Body</code></td><td>Day-1 bespoke email body</td><td>Text (or Long Text)</td></tr>
-      <tr><td><code>Gather_Script</code></td><td>30-45s script (call opener + LinkedIn video)</td><td>Text</td></tr>
-      <tr><td><code>Gather_Connection_Note</code></td><td>LinkedIn connection note (&lt;300 chars)</td><td>Text</td></tr>
-    </table>
 
-    <h3>Step 2 — Wire the Sequence (~5 min)</h3>
-    <p>Open your target sequence. Wire each step to the custom field variables via the <code>{ }</code> picker. <strong>Never hand-type the tokens.</strong></p>
-    <ul style="color: var(--muted); font-size: 13px; padding-left: 20px;">
-      <li><strong>Day-1 email (position 1):</strong> Subject = <code>Gather_Email_Subject</code>, Body = <code>Gather_Email_Body</code></li>
-      <li><strong>Call steps (Day 1, 3, 8):</strong> Notes = <code>Gather_Script</code></li>
-      <li><strong>LinkedIn video step (Day 5/6):</strong> Notes = <code>Gather_Script</code></li>
-      <li><strong>LinkedIn connection (Day 1):</strong> Message = <code>Gather_Connection_Note</code></li>
-    </ul>
+    <h3>Step 2 — Wire the Day-1 Email (~2 min)</h3>
+    <ol style="color: var(--muted); font-size: 13px; padding-left: 20px; margin-bottom: 16px;">
+      <li>Click <strong>Edit</strong> on <strong>Step 1: Email (Day 1)</strong></li>
+      <li>Click the <strong>Subject</strong> field &rarr; click the <strong>{ }</strong> button &rarr; select <code>Gather_Email_Subject</code></li>
+      <li>Click the <strong>Body</strong> field &rarr; <strong>delete ALL existing text</strong> &rarr; click <strong>{ }</strong> &rarr; select <code>Gather_Email_Body</code></li>
+      <li>Leave <strong>ONLY</strong> the merge token in the Body. No boilerplate, no greeting, no signature.</li>
+      <li>Click <strong>Save Step</strong></li>
+    </ol>
+    <div class="callout" style="background:#FEF2F2; border-left-color:#EF4444; margin: 16px 0;">
+      <p><strong>NEVER hand-type the token.</strong> Always use the <code>{ }</code> picker. Hand-typed tokens ship as literal <code>{{...}}</code> text and the email is broken.</p>
+    </div>
 
-    <h3>Step 3 — Per-Run Import (1 minute)</h3>
-    <p>Each run writes <code>apollo-import.csv</code> with headers matching the custom field names. In Apollo: Import &rarr; CSV &rarr; match on <strong>Email</strong> &rarr; map each <code>Gather_*</code> column to its field. Run. Then review and activate.</p>
+    <h3>Step 3 — Wire the Call Steps (~1 min each)</h3>
+    <ol style="color: var(--muted); font-size: 13px; padding-left: 20px; margin-bottom: 16px;">
+      <li>Click <strong>Edit</strong> on <strong>Step 2: Call (Day 1)</strong></li>
+      <li>Find the <strong>Notes / Call Script</strong> field &rarr; click <strong>{ }</strong> &rarr; select <code>Gather_Script</code></li>
+      <li>Click <strong>Save Step</strong></li>
+      <li>Repeat for <strong>Step 4: Call (Day 3)</strong> and <strong>Step 7: Call (Day 8)</strong></li>
+    </ol>
+
+    <h3>Step 4 — Wire the LinkedIn Connection (~1 min)</h3>
+    <ol style="color: var(--muted); font-size: 13px; padding-left: 20px; margin-bottom: 16px;">
+      <li>Click <strong>Edit</strong> on <strong>Step 3: LinkedIn Connection (Day 1)</strong></li>
+      <li>Find the <strong>Message</strong> field &rarr; click <strong>{ }</strong> &rarr; select <code>Gather_Connection_Note</code></li>
+      <li>Click <strong>Save Step</strong></li>
+    </ol>
+
+    <h3>Step 5 — Verify Before Trusting</h3>
+    <p>Preview a contact in the sequence. Confirm the day-1 email renders the bespoke subject and body (not an empty token or literal <code>{{...}}</code> text). If it renders, setup is correct and permanent.</p>
+
+    <h3>Per-Run Import (1 minute, every morning)</h3>
+    <p>Each run writes <code>apollo-import.csv</code>. In Apollo: Import &rarr; CSV &rarr; match on <strong>Email</strong> &rarr; map each <code>Gather_*</code> column to its field. Run. Then review and activate.</p>
   </section>
 
   <!-- Workflow Diagram -->

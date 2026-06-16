@@ -37,9 +37,19 @@ in the README.
    > score these accounts into a hopper, and register the morning driver and weekly digest
    > scheduled tasks."
 
-5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence
-   template per `hopper/APOLLO_SETUP.md`. These already exist in the workspace — you just pick them
-   from the `{ }` picker. Claude will pause and guide you.
+5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence template.
+   
+   This is the only manual UI step. It takes 5 minutes and you do it once.
+   
+   Open Apollo → **Engage** → **Sequences** → open YOUR target sequence → **Steps** tab.
+   
+   - **Day-1 email:** Edit Step 1 → Subject field → click the **{ }** button → select `Gather_Email_Subject`. Body field → delete all text → click **{ }** → select `Gather_Email_Body` (leave ONLY this token). Save.
+   - **Call steps (Day 1, 3, 8):** Edit each → Notes field → click **{ }** → select `Gather_Script`. Save.
+   - **LinkedIn connection (Day 1):** Edit → Message field → click **{ }** → select `Gather_Connection_Note`. Save.
+   
+   **Never hand-type the tokens.** Always use the `{ }` picker or emails ship as literal text.
+   
+   Full visual walkthrough with screenshots: `hopper/APOLLO_SETUP.md`. Claude will pause and guide you.
 6. **Bank approvals.** Click **Run now** once on the `apollo-morning-driver` task in the Scheduled
    panel. Approve the tool prompts. Every future run is unattended.
 
@@ -103,10 +113,15 @@ Sanity-check: `python3 hopper/gate.py status` should list your ranked accounts.
 
 ### Step 4 — One-time Apollo wiring (you, in the Apollo UI)
 
-Follow `hopper/APOLLO_SETUP.md`:
-- In your sequence, set the day-1 email Subject and Body to the merge variables via the `{ }`
-  picker (do NOT hand-type the tokens), and reference `Gather_Script` / `Gather_Connection_Note`
-  on the call and LinkedIn steps.
+Follow `hopper/APOLLO_SETUP.md` for the full visual walkthrough. In short:
+
+- Open Apollo → **Engage** → **Sequences** → open YOUR target sequence → **Steps** tab.
+- **Day-1 email (Step 1):** Edit → Subject field → click **{ }** → select `Gather_Email_Subject`. Body field → delete all text → click **{ }** → select `Gather_Email_Body` (leave ONLY the token). Save.
+- **Call steps (Day 1, 3, 8):** Edit each → Notes field → click **{ }** → select `Gather_Script`. Save.
+- **LinkedIn connection (Day 1):** Edit → Message field → click **{ }** → select `Gather_Connection_Note`. Save.
+
+**Never hand-type the tokens.** Always use the `{ }` picker or emails ship as literal text.
+
 - Per run you import that day's `apollo-import.csv` (match on Email) to fill the fields.
 
 ### Step 5 — Register your scheduled tasks (hand this to Claude)

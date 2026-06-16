@@ -1,64 +1,191 @@
-# Apollo per-contact content: one-time setup + per-run upload
+# Apollo UI Wiring — Wire Gather Custom Fields Into YOUR Sequence
 
-Apollo sequence emails use ONE shared template with `{{merge}}` variables. To send each
-contact their bespoke copy (and show reps the right script per contact), we store the
-generated content in Apollo CUSTOM FIELDS and reference those fields as merge tags. The
-Apollo MCP can't create custom fields, wire templates, or run imports, so those are one-time
-UI actions. After setup, each run is a 1-minute CSV import.
+The 4 Gather custom fields (`Gather_Email_Subject`, `Gather_Email_Body`, `Gather_Script`, `Gather_Connection_Note`) already exist in the Apollo workspace. They were created once for all reps. **You do NOT create fields. You pick them from a menu and drop them into YOUR sequence template.**
 
-## Step 1 — Create 4 custom fields (one time, ~3 min)
-1. Top-right gear icon -> **Settings**.
-2. Left nav -> **Custom Fields** (under the Data / General section).
-3. Make sure the object selector at the top is **Contacts/People** (not Accounts).
-4. Click **+ Add Custom Field** and create each of these. Type = **Text** for all (Text holds long values; if a "Paragraph/Long text" type is offered, use it for the two body fields):
+This guide shows every click so a new user can follow it cold. If you have never wired custom fields in Apollo, read every line. If you have done it before, skip to the checklist at the bottom.
 
-   | Field name (type exactly) | Holds |
-   |---|---|
-   | `Gather_Email_Subject` | day-1 email subject |
-   | `Gather_Email_Body` | day-1 bespoke email body |
-   | `Gather_Script` | 30-45s script (call opener + LinkedIn video) |
-   | `Gather_Connection_Note` | LinkedIn connection note (<300 chars) |
+Time: 5 minutes.
+Prerequisite: You must already have an Apollo sequence (or know its name). If not, create one first or ask Claude to make it for you.
 
-5. Save each. They now appear on every contact record and in the email variable picker.
+---
 
-## Step 2 — Wire the sequence ONCE (~5 min)
-Open sequence **"Claude Research -> Execution Queue"** -> it stays INACTIVE for now.
+## Step 1 — Open YOUR sequence
 
-**Day-1 email step (position 1):** click the step to edit the email.
-- Subject field: click the **variable / { } button** -> search "Gather_Email_Subject" -> insert. The subject box should now read only the inserted `{{...}}` token.
-- Body: delete any existing template text. Click the **{ } variable button** -> insert **Gather_Email_Body**. The body should be ONLY that token.
-- CRITICAL: always insert via the variable picker, never hand-type the token. Apollo assigns the real merge key when the field is created, and the picker guarantees it matches.
-- Save the step.
+1. Go to **Engage** → **Sequences** in the left Apollo nav.
+2. Find the sequence you want to use (e.g. "Gather Outbound Q2").
+3. Click the sequence name to open it.
+4. Click **Steps** (top tab).
 
-**Call steps (Day 1, Day 3, Day 8) and the Day-5/6 LinkedIn video step:** open each step's note/instructions, click the variable button, insert **Gather_Script**. (If the note field does not offer variables, leave a line like "Script: see Gather_Script on the contact record" — the field is visible on the contact panel during the task.)
+What you see:
+```
+┌─────────────────────────────────────────────────────────┐
+│  Sequences  >  Gather Outbound Q2                       │
+│  [Overview] [Steps] [Settings] [Analytics]              │
+│                                                         │
+│  Step 1: Email    Day 1  [Edit]                         │
+│  Step 2: Call     Day 1  [Edit]                         │
+│  Step 3: LinkedIn Day 1  [Edit]                         │
+│  Step 4: Call     Day 3  [Edit]                         │
+│  Step 5: LinkedIn Day 5  [Edit]                         │
+│  Step 6: Email    Day 7  [Edit]                         │
+│  Step 7: Call     Day 8  [Edit]                         │
+└─────────────────────────────────────────────────────────┘
+```
 
-**Day-1 LinkedIn connection step:** insert **Gather_Connection_Note** into the message/note.
+---
 
-Once the day-1 email Body = the Gather_Email_Body variable, the auto_email sends each contact's
-bespoke copy. You review before activating, so auto-send is safe (your review is the gate).
-GUARD: never activate a contact before the import (Step 3) has populated their fields, or an
-empty field sends a blank email.
+## Step 2 — Wire the Day-1 Email Subject
 
-## Step 2b — Verify once (2 min, do this before trusting it)
-DHL's 6 contacts are already enrolled (paused) with their apollo-import.csv ready. After Steps 1-3:
-open one DHL contact in the sequence -> Preview the day-1 email -> confirm it renders the bespoke
-body (not an empty token). If it renders, setup is correct and permanent.
+1. Click **Edit** on **Step 1: Email (Day 1)**.
+2. Click into the **Subject** field.
+3. Click the **{ }** button (the curly-brace icon to the right of the Subject field).
 
-## Step 3 — Per run: import the CSV (1 minute)
-Each run the pipeline writes `apollo-import.csv` (headers already match the field names above).
-In Apollo: Import -> CSV -> match on **Email** -> map each `Gather_*` column to its custom field
--> run. This updates the already-created contacts with their per-contact content. Then review
-and activate the sequence.
+What you see:
+```
+┌─────────────────────────────────────────────────────────┐
+│  Edit Email Step                                        │
+│                                                         │
+│  Subject    [___________________________] { }           │
+│                              ^^^^^^^                    │
+│                              click this button          │
+└─────────────────────────────────────────────────────────┘
+```
 
-## What's automated vs manual
-- Automated (pipeline): research, sourcing, enrichment, content generation, contact creation in
-  Apollo, paused enrollment, and writing the import-ready CSV.
-- Manual (Apollo UI, unavoidable with current tools): the one-time field creation + template
-  wiring (Steps 1-2), and the per-run CSV import (Step 3). All quick.
+4. A dropdown appears with custom field categories.
+5. Scroll or search for **Gather_Email_Subject**.
+6. Click it. The Subject field now shows only the merge token — no hand-typed text.
 
-## Field <-> CSV column map (for the importer)
-email -> match key
-Gather_Email_Subject -> Gather_Email_Subject
-Gather_Email_Body -> Gather_Email_Body
-Gather_Script -> Gather_Script
-Gather_Connection_Note -> Gather_Connection_Note
+Correct result:
+```
+Subject: {{custom_field_123_Gather_Email_Subject}}
+```
+
+**NEVER type the token by hand.** Always use the `{ }` picker. Hand-typed tokens will NOT merge at send time and the email will ship with literal `{{...}}` text.
+
+---
+
+## Step 3 — Wire the Day-1 Email Body
+
+1. In the same Step 1 edit panel, click into the **Body** field.
+2. Delete any existing template text in the Body.
+3. Click the **{ }** button next to the Body field.
+4. Search for **Gather_Email_Body**.
+5. Click it.
+
+Correct result — Body field should contain ONLY this token:
+```
+Body: {{custom_field_456_Gather_Email_Body}}
+```
+
+**Again: do NOT type this yourself.** If you see any other text in the Body field (greetings, signatures, boilerplate), delete it. The merge token must be the ONLY content. The actual email body is populated per-contact via CSV import before sending.
+
+6. Click **Save Step**.
+
+---
+
+## Step 4 — Wire the Call Step Notes
+
+The call step uses `Gather_Script` as the opener script that the rep reads when making the call.
+
+1. Back in the sequence Steps tab, click **Edit** on **Step 2: Call (Day 1)**.
+2. Look for the **Notes / Call Script** field (sometimes labeled "Call Instructions" or "Notes").
+3. Click the **{ }** button next to that field.
+4. Search for **Gather_Script**.
+5. Click it.
+
+Correct result:
+```
+Notes: {{custom_field_789_Gather_Script}}
+```
+
+6. Click **Save Step**.
+
+7. Repeat for **Step 4: Call (Day 3)** and **Step 7: Call (Day 8)** — same process, same field `Gather_Script`.
+
+---
+
+## Step 5 — Wire the LinkedIn Connection Step
+
+1. Back in the sequence Steps tab, click **Edit** on **Step 3: LinkedIn Connection Request (Day 1)**.
+2. Look for the **Message** or **Connection Note** field.
+3. Click the **{ }** button next to that field.
+4. Search for **Gather_Connection_Note**.
+5. Click it.
+
+Correct result:
+```
+Message: {{custom_field_012_Gather_Connection_Note}}
+```
+
+6. Click **Save Step**.
+
+---
+
+## Step 6 — Verify Before Trusting
+
+Before your first run, preview a contact to confirm the merge works.
+
+1. In Apollo, go to **People** → find any contact already in your sequence.
+2. Open their record.
+3. Scroll to the **Custom Fields** section on the contact panel.
+4. Verify that `Gather_Email_Subject`, `Gather_Email_Body`, `Gather_Script`, and `Gather_Connection_Note` all appear as fields. If they do not, something is wrong — ask for help.
+
+**Guard: if the custom fields do NOT appear on the contact record, STOP.** The fields were not wired correctly or the contact is not in the right sequence.
+
+---
+
+## Quick Checklist (for experienced users)
+
+If you have done this before, just run through these 5 checks:
+
+- [ ] Day-1 email Subject = `Gather_Email_Subject` via `{ }` picker
+- [ ] Day-1 email Body = `Gather_Email_Body` via `{ }` picker (ONLY token, no other text)
+- [ ] Day-1 call Notes = `Gather_Script` via `{ }` picker
+- [ ] Day-3 call Notes = `Gather_Script` via `{ }` picker
+- [ ] Day-8 call Notes = `Gather_Script` via `{ }` picker
+- [ ] Day-1 LinkedIn Message = `Gather_Connection_Note` via `{ }` picker
+- [ ] Sequence is INACTIVE until you import a CSV and review
+
+---
+
+## What Is Automated vs Manual
+
+| Action | Who Does It | When |
+|--------|------------|------|
+| Research contacts | Claude / Clay | Every morning |
+| Write personalized email per contact | Claude | Every morning |
+| Write call script per contact | Claude | Every morning |
+| Write LinkedIn note per contact | Claude | Every morning |
+| Create contacts in Apollo | Claude | Every morning |
+| Export `apollo-import.csv` | Claude | Every morning |
+| **Wire custom fields into sequence template** | **You** | **Once, right now** |
+| Import `apollo-import.csv` into Apollo | You | Per run (1 minute) |
+| Review and activate | You | Per run |
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---------|--------------|-----|
+| Hand-type `{{Gather_Email_Subject}}` instead of using the `{ }` picker | Apollo assigns internal IDs. Hand-typed tokens are treated as literal text and ship as-is. | Delete, re-insert via picker. |
+| Leave boilerplate text in the Body field alongside the merge token | The body will contain both the boilerplate AND the merged content, producing a garbled email. | Delete ALL text in Body, leave ONLY the merge token. |
+| Activate a contact before importing the CSV | Custom fields are empty until the CSV import fills them. Activating before import sends a blank email. | Always import CSV first, then activate. |
+| Sequence is ACTIVE instead of INACTIVE during setup | If contacts are already enrolled, an accidental activation sends before you review. | Keep the sequence INACTIVE until your first run. |
+
+---
+
+## What Per Run Looks Like After This One-Time Setup
+
+Each morning the pipeline writes an `apollo-import.csv` with one row per contact. You do this in 60 seconds:
+
+1. Apollo → **Import** → **CSV** → upload `apollo-import.csv`
+2. Match on **Email**
+3. Map `Gather_Email_Subject` → `Gather_Email_Subject`
+4. Map `Gather_Email_Body` → `Gather_Email_Body`
+5. Map `Gather_Script` → `Gather_Script`
+6. Map `Gather_Connection_Note` → `Gather_Connection_Note`
+7. Run import
+8. Review contacts → Activate
+
+Done.

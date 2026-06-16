@@ -60,7 +60,19 @@ Do not skip these. The setup will fail without them.
    > `run apollo setup`
 
 4. **Wait and approve.** Claude will scaffold your workspace and hydrate your configs. Click **Always allow** on every tool prompt. After setup finishes, go to the Scheduled panel, click **Run now** once on `apollo-morning-driver`, and **Always allow** again. This banks every approval needed for unattended morning runs — future runs need zero interaction.
-5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence template per `hopper/APOLLO_SETUP.md`. These already exist in the workspace — you just pick them from the `{ }` picker. (5 minutes.)
+5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence template.
+   
+   This is the only manual UI step. It takes 5 minutes and you do it once.
+   
+   Open Apollo → **Engage** → **Sequences** → open YOUR target sequence → **Steps** tab.
+   
+   - **Day-1 email:** Edit Step 1 → Subject field → click the **{ }** button → select `Gather_Email_Subject`. Body field → delete all text → click **{ }** → select `Gather_Email_Body` (leave ONLY this token). Save.
+   - **Call steps (Day 1, 3, 8):** Edit each → Notes field → click **{ }** → select `Gather_Script`. Save.
+   - **LinkedIn connection (Day 1):** Edit → Message field → click **{ }** → select `Gather_Connection_Note`. Save.
+   
+   **Never hand-type the tokens.** Always use the `{ }` picker or emails ship as literal text.
+   
+   Full visual walkthrough with screenshots: `hopper/APOLLO_SETUP.md`
 
 That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.
 

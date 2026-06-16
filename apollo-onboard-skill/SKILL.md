@@ -4,8 +4,9 @@ description: >
   One-command onboarding for the Self-Driving Apollo Pipeline. Stands up the whole system for a
   new rep: scaffolds the workspace, discovers their Slack and Apollo IDs, writes their config,
   scores their accounts into the hopper, and registers the morning driver + weekly digest
-  scheduled tasks. Pauses only for the human-only steps (the rep's account list, creating Apollo
-  custom fields in the UI, and the one-time "Run now" approval). Use this skill whenever the rep
+  scheduled tasks. Pauses only for the human-only steps (the rep's account list, wiring
+  existing Apollo custom fields into the rep's sequence template, and the one-time "Run now"
+  approval). Use this skill whenever the rep
   says "run apollo setup", "run setup", "set up my apollo pipeline", "onboard me to the apollo
   pipeline", "set up the self-driving pipeline", or any request to install/stand up this system
   for themselves. Do not use for a daily run (that is the apollo-morning-driver scheduled task).
@@ -148,20 +149,37 @@ into their own sequence template. The Apollo MCP cannot do this, so the rep must
 in the Apollo web UI. Wait for them to confirm before continuing.
 
 **Exact instructions:**
-1. Open your target sequence → edit the **day-1 email step**
-   - Click into the **Subject** field → use the **{ }** picker → select `Gather_Email_Subject`
-   - Click into the **Body** field → use the **{ }** picker → select `Gather_Email_Body`
-   - **Never hand-type the token** — always use the picker.
-2. In the same sequence, edit the **call step** → reference `Gather_Script` via the picker.
-3. Edit the **LinkedIn connection step** → reference `Gather_Connection_Note` via the picker.
 
-Point them to `$BASE/hopper/APOLLO_SETUP.md` for screenshots. Note: per run they import that
-day's `apollo-import.csv`, matching on Email.
+1. Open Apollo → **Engage** → **Sequences** → open YOUR target sequence → **Steps** tab.
+
+2. **Day-1 email (Step 1):** Click **Edit**
+   - Click into the **Subject** field → click the **{ }** button → select `Gather_Email_Subject`
+   - Click into the **Body** field → **delete ALL existing text** → click **{ }** → select `Gather_Email_Body`
+   - **Leave ONLY the merge token in the Body field.** No boilerplate, no greeting, no signature.
+   - Click **Save Step**
+
+3. **Call steps (Day 1, 3, 8):** For each, click **Edit**
+   - Find the **Notes / Call Script** field → click **{ }** → select `Gather_Script`
+   - Click **Save Step**
+
+4. **LinkedIn connection (Day 1):** Click **Edit**
+   - Find the **Message** field → click **{ }** → select `Gather_Connection_Note`
+   - Click **Save Step**
+
+**CRITICAL RULES:**
+- **Never hand-type the token.** Always use the `{ }` picker or the merge will fail and emails ship as literal `{{...}}` text.
+- **Body field must contain ONLY the merge token.** Any extra text produces garbled emails.
+- **Keep the sequence INACTIVE** until your first CSV import and review.
+
+Point them to `$BASE/hopper/APOLLO_SETUP.md` for the full visual walkthrough with ASCII screenshots of each screen.
 
 **Expected output (after rep confirms):**
 ```
 ✅ STEP 4 — Apollo fields wired (human confirmed)
-   Custom fields created and sequence template set.
+   Gather_Email_Subject  → Day-1 email Subject
+   Gather_Email_Body     → Day-1 email Body (only token)
+   Gather_Script         → Call steps (Day 1, 3, 8)
+   Gather_Connection_Note→ LinkedIn connection step
 ```
 
 ---
