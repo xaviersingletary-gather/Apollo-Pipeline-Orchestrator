@@ -143,22 +143,17 @@ Then run `python3 "$BASE/hopper/gate.py" status`.
 
 ## Step 4 — Apollo field wiring (HUMAN STEP — guide only)
 
-The Apollo MCP cannot create custom fields or run the CSV import. Tell the rep to do this **once**
+The four Gather custom fields already exist in the workspace. The rep only needs to wire them
+into their own sequence template. The Apollo MCP cannot do this, so the rep must do it **once**
 in the Apollo web UI. Wait for them to confirm before continuing.
 
 **Exact instructions:**
-1. Open Apollo → **Settings** → **Custom Fields** → Object = **Contacts**
-2. Create these 4 fields, type = **Text**:
-   - `Gather_Email_Subject`
-   - `Gather_Email_Body`
-   - `Gather_Script`
-   - `Gather_Connection_Note`
-3. Open your sequence → edit the **day-1 email step**
+1. Open your target sequence → edit the **day-1 email step**
    - Click into the **Subject** field → use the **{ }** picker → select `Gather_Email_Subject`
    - Click into the **Body** field → use the **{ }** picker → select `Gather_Email_Body`
    - **Never hand-type the token** — always use the picker.
-4. In the same sequence, edit the **call step** → reference `Gather_Script` via the picker.
-5. Edit the **LinkedIn connection step** → reference `Gather_Connection_Note` via the picker.
+2. In the same sequence, edit the **call step** → reference `Gather_Script` via the picker.
+3. Edit the **LinkedIn connection step** → reference `Gather_Connection_Note` via the picker.
 
 Point them to `$BASE/hopper/APOLLO_SETUP.md` for screenshots. Note: per run they import that
 day's `apollo-import.csv`, matching on Email.

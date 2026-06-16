@@ -60,7 +60,7 @@ Do not skip these. The setup will fail without them.
    > `run apollo setup`
 
 4. **Wait and approve.** Claude will scaffold your workspace and hydrate your configs. Click **Always allow** on every tool prompt. After setup finishes, go to the Scheduled panel, click **Run now** once on `apollo-morning-driver`, and **Always allow** again. This banks every approval needed for unattended morning runs — future runs need zero interaction.
-5. **One-time Apollo UI step.** Create the four custom fields in Apollo and wire them into your sequence template per `hopper/APOLLO_SETUP.md`. Claude will remind you. (5 minutes.)
+5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence template per `hopper/APOLLO_SETUP.md`. These already exist in the workspace — you just pick them from the `{ }` picker. (5 minutes.)
 
 That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.
 

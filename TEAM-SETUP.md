@@ -37,8 +37,9 @@ in the README.
    > score these accounts into a hopper, and register the morning driver and weekly digest
    > scheduled tasks."
 
-5. **One-time Apollo UI step.** Create the four custom fields in Apollo and wire them into your
-   sequence template per `hopper/APOLLO_SETUP.md`. Claude will pause and guide you.
+5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence
+   template per `hopper/APOLLO_SETUP.md`. These already exist in the workspace — you just pick them
+   from the `{ }` picker. Claude will pause and guide you.
 6. **Bank approvals.** Click **Run now** once on the `apollo-morning-driver` task in the Scheduled
    panel. Approve the tool prompts. Every future run is unattended.
 
@@ -103,8 +104,7 @@ Sanity-check: `python3 hopper/gate.py status` should list your ranked accounts.
 ### Step 4 — One-time Apollo wiring (you, in the Apollo UI)
 
 Follow `hopper/APOLLO_SETUP.md`:
-- Create 4 custom fields: `Gather_Email_Subject`, `Gather_Email_Body`, `Gather_Script`, `Gather_Connection_Note`.
-- In your sequence, set the day-1 email Subject and Body to those merge variables via the `{ }`
+- In your sequence, set the day-1 email Subject and Body to the merge variables via the `{ }`
   picker (do NOT hand-type the tokens), and reference `Gather_Script` / `Gather_Connection_Note`
   on the call and LinkedIn steps.
 - Per run you import that day's `apollo-import.csv` (match on Email) to fill the fields.
