@@ -13,11 +13,8 @@ Before you start, confirm ALL of the following:
       both require an active Gmail mailbox inside Apollo.
 - [ ] **Cowork connected to Apollo, Slack, Gmail, and Clay.** All four tools must show as available
       in your tool panel before you trigger setup.
-- [ ] **Account list ready.** Have your target accounts (names, domains, any notes) copied and ready
+- [ ] **Account list ready.** Have your target accounts (company names, domains, any notes) copied and ready
       to paste into the session.
-- [ ] **rep_config.json pre-filled (optional but recommended).** If you already know your Slack user
-      ID, Apollo mailbox ID, and sequence ID, drop them into `hopper/rep_config.json` before starting.
-      If not, Claude will discover them automatically.
 
 **All boxes checked?** Use the fast path below.
 
@@ -28,18 +25,21 @@ Before you start, confirm ALL of the following:
 The fastest way to get running is to let Claude handle the wiring. This is the same flow described
 in the README.
 
-1. **Open Claude Cowork.** Paste the repo contents into the session (or add the repo to Context).
+1. **Open Claude Cowork.** Add the repo to Cowork context. Paste the repo link or drag the local folder into the session.
 2. **Connect your stack.** Add Apollo, Slack, Gmail, and Clay as available tools.
-3. **Hand Claude your account list.** Paste your target accounts.
-4. **Tell Claude:**
+3. **Send one command** with your identity and account list:
 
-   > "Set up the Apollo Pipeline Orchestrator for me. Fill my rep identity and Apollo config,
-   > score these accounts into a hopper, and register the morning driver and weekly digest
-   > scheduled tasks."
+   > `run apollo setup. My name is [Your Name], email [you@gather.ai], target sequence "[Sequence Name]". Here are my accounts:`
+   >
+   > `[paste company names or domains, one per line]`
 
-5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence template.
-   
-   This is the only manual UI step. It takes 5 minutes and you do it once.
+   Claude will extract your identity, scaffold the workspace, score your accounts, and wire the config in one flow.
+
+4. **Approve tool prompts.** As Claude works, you will see permission prompts for Apollo, Clay, and Slack. Click **Always allow** on every one. This is normal and required.
+
+5. **Bank approvals.** When Claude says setup is done, go to Cowork's **Scheduled** panel, find `apollo-morning-driver`, click **Run now** once, and click **Always allow** again. This one click banks every future approval so the 7am runs fire unattended.
+
+6. **One-time Apollo UI step (5 min).** This is the only manual UI work you do once. Wire the four Gather custom fields into your sequence template:
    
    Open Apollo → **Engage** → **Sequences** → open YOUR target sequence → **Steps** tab.
    
@@ -49,12 +49,9 @@ in the README.
    
    **Never hand-type the tokens.** Always use the `{ }` picker or emails ship as literal text.
    
-   Full visual walkthrough with screenshots: `hopper/APOLLO_SETUP.md`. Claude will pause and guide you.
-6. **Bank approvals.** Click **Run now** once on the `apollo-morning-driver` task in the Scheduled
-   panel. Approve the tool prompts. Every future run is unattended.
+   Full visual walkthrough: `hopper/APOLLO_SETUP.md`. Claude will pause and guide you.
 
-That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content,
-and Slacking you the staged batch.
+7. **You are done.** Claude will confirm everything is live. The next weekday morning, the Morning Driver will run automatically, Slacking you the staged batch.
 
 ---
 
@@ -85,12 +82,18 @@ templates. It reports which fields still need filling.
 
 Open `hopper/rep_config.json`. Paste this to Claude:
 
-> "Fill my rep_config.json. Find my Slack user ID with slack_search_users on my name. Find my
-> Apollo sender mailbox id with apollo_email_accounts_index. Find or create my Apollo sequence
-> and put its id + name in. My name is ___, email ___."
+> `run apollo setup. My name is [Your Name], email [you@gather.ai], target sequence "[Sequence Name]". Here are my accounts:`
+>
+> `[paste account names or domains]`
+
+Claude will discover your Slack user ID, Apollo mailbox ID, and sequence ID automatically.
+
+If you prefer manual discovery, tell Claude:
+> "Find my Slack user ID with slack_search_users on my name. Find my Apollo sender mailbox
+> id with apollo_email_accounts_index. Find my Apollo sequence and put its id + name in."
 
 Then update `hopper/apollo_config.json` with your `sequence_id`, `sequence_name`, and
-`sender_email_account_id` (same values), so the pipeline targets YOUR sequence.
+`sender_email_account_id`.
 
 ### Step 3 — Build your hopper (hand this to Claude)
 

@@ -28,9 +28,9 @@ rep exactly what to do:
 
 - ✅ Apollo account with a Gmail mailbox **connected and active** (required for sender identity
   and sequence enrollment).
-- ✅ `rep_config.json` exists and contains `name`, `email`, and `sequence_id`. This file is either
-  pre-filled by the rep or discovered from a prior session. **This skill does not interview for
-  identity — it reads what is already there.**
+- ✅ `name`, `email`, and target **sequence name** from Apollo. The onboarding skill needs
+  these to discover your Slack user ID and Apollo mailbox ID. Pass them in your prompt or
+  the skill will ask when it starts.
 - ✅ The repo "Apollo Pipeline Orchestrator" is accessible in this Cowork session (either added
   via the **Context** panel or cloned into the user's OUTPUTS).
 
@@ -74,27 +74,16 @@ Run: `python3 "$BASE/hopper/setup.py"`
 
 ---
 
-## Step 2 — Identity (automatic — read only)
+## Step 2 — Identity (automatic — read from prompt or ask once)
 
-Open `$BASE/hopper/rep_config.json`. Do not ask the rep for name, email, or sequence — these
-must already be present.
+Open `$BASE/hopper/rep_config.json`. If `rep_name` and `rep_email` are placeholders, extract
+identity from the prompt that triggered this skill, or ask the rep **once** for their name,
+email, and target sequence name. Then write the values back.
 
-**If any required field is missing (`name`, `email`, or `sequence_id`):**
-```
-❌ STEP 2 — Missing required identity fields
-
-Your rep_config.json is missing required fields. Please fill:
-  • name
-  • email
-  • sequence_id
-
-Then re-trigger this skill.
-```
-
-**If all fields are present, resolve the live IDs and write back:**
-- Slack ID: `slack_search_users` on `name` → capture `U********`
+Then resolve the live IDs automatically:
+- Slack ID: `slack_search_users` on the rep's name → capture `U********`
 - Apollo sender mailbox: `apollo_email_accounts_index` → capture Gmail mailbox id
-- Sequence: `apollo_emailer_campaigns_search` by `sequence_id` or name → confirm id + name
+- Sequence: `apollo_emailer_campaigns_search` by the sequence name → confirm id + name
 
 Mirror `sequence_id`, `sequence_name`, and `sender_email_account_id` into
 `$BASE/hopper/apollo_config.json`.
@@ -102,17 +91,21 @@ Mirror `sequence_id`, `sequence_name`, and `sender_email_account_id` into
 **Expected output:**
 ```
 ✅ STEP 2 — Identity resolved
-   Slack user_id:     U********
-   Apollo mailbox id:  <mailbox_id>
-   Sequence id:       <sequence_id>
-   Sequence name:     <sequence_name>
+   Name:               <rep_name>
+   Email:              <rep_email>
+   Slack user_id:      U********
+   Apollo mailbox id:   <mailbox_id>
+   Sequence id:        <sequence_id>
+   Sequence name:      <sequence_name>
 ```
 
 ---
 
-## Step 3 — Build the hopper (automatic)
+## Step 3 — Build the hopper (automatic, needs account list)
 
-The rep must have already provided their account list (via context, paste, or prior message).
+Extract the account list from the prompt that triggered this skill. If not provided, ask
+once: "Please paste your target accounts (company names or domains, one per line)."
+
 For each account, run the `account-scoring` skill (Fit × Signal).
 
 Write `$BASE/hopper/hopper.jsonl`, one JSON object per line, ranked best-first, schema:
@@ -222,7 +215,8 @@ run cannot answer a permission prompt.
 ```
 ✅ STEP 6 — Tool approvals banked (human confirmed)
    Clay, Apollo, and Slack prompts approved once.
-   Future 7am runs will fire unattended.
+   Future morning runs will fire unattended.
+   You will NOT need to approve anything again.
 ```
 
 ---
@@ -244,6 +238,9 @@ run cannot answer a permission prompt.
    • Run-now approval       → done once (Step 6)
    • Per-account enroll     → you review and confirm before send
    • Bespoke sends          → calls, LinkedIn videos, manual emails
+
+**You are done.** Your next weekday morning, the Morning Driver will fire automatically.
+Expect a Slack DM with the staged batch. No more setup ever required.
 ```
 
 ---

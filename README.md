@@ -46,24 +46,29 @@ Do not skip these. The setup will fail without them.
 
 - [ ] **Apollo account with a connected Gmail mailbox** (hard prerequisite — sequences send from this mailbox)
 - [ ] **Cowork connected to:** Apollo, Slack, Gmail, Clay
-- [ ] **Target account list ready** (company names, domains, any notes)
-- [ ] **20–30 minutes free** (you will be approving tool prompts)
+- [ ] **Target account list ready** (company names or domains, one per line)
+- [ ] **20–30 minutes free** (you will be approving tool prompts and doing one Apollo UI step)
 
 ### Fast path (recommended)
 
 ⏱ **Time expectation: 15–30 minutes.** Most of it is waiting and clicking "Always allow."
 
 1. **Connect your apps.** In Cowork settings, add Apollo, Slack, Gmail, and Clay as available tools.
-2. **Add the repo to Cowork context.** Paste the repo link above into the session **and add it to Cowork context** — do not just drop a link in chat. You can also drag the local folder into the session.
-3. **Send one command:**
+2. **Add the repo to Cowork context.** Paste the repo link above into the session **and add it to Cowork context** — do not just drop a link in chat. Or drag the local folder into the session.
+3. **Send one command** with your identity and account list:
 
-   > `run apollo setup`
+   > `run apollo setup. My name is [Your Name], email [you@gather.ai], target sequence "[Sequence Name]". Here are my accounts:`
+   >
+   > `[paste company names or domains, one per line]`
 
-4. **Wait and approve.** Claude will scaffold your workspace and hydrate your configs. Click **Always allow** on every tool prompt. After setup finishes, go to the Scheduled panel, click **Run now** once on `apollo-morning-driver`, and **Always allow** again. This banks every approval needed for unattended morning runs — future runs need zero interaction.
-5. **One-time Apollo UI step.** Wire the four Gather custom fields into your sequence template.
-   
-   This is the only manual UI step. It takes 5 minutes and you do it once.
-   
+   Claude will extract your identity, scaffold the workspace, score your accounts, and wire the config in one flow.
+
+4. **Approve tool prompts.** As Claude works, you will see permission prompts for Apollo, Clay, and Slack. Click **Always allow** on every one. This is normal and required.
+
+5. **Bank approvals.** When Claude says setup is done, go to Cowork's **Scheduled** panel, find `apollo-morning-driver`, click **Run now** once, and click **Always allow** again. This one click banks every future approval so the 7am runs fire unattended.
+
+6. **One-time Apollo UI step (5 min).** This is the only manual UI work you do once. Wire the four Gather custom fields into your sequence template:
+
    Open Apollo → **Engage** → **Sequences** → open YOUR target sequence → **Steps** tab.
    
    - **Day-1 email:** Edit Step 1 → Subject field → click the **{ }** button → select `Gather_Email_Subject`. Body field → delete all text → click **{ }** → select `Gather_Email_Body` (leave ONLY this token). Save.
@@ -72,9 +77,11 @@ Do not skip these. The setup will fail without them.
    
    **Never hand-type the tokens.** Always use the `{ }` picker or emails ship as literal text.
    
-   Full visual walkthrough with screenshots: `hopper/APOLLO_SETUP.md`
+   Full visual walkthrough: `hopper/APOLLO_SETUP.md`
 
-That is it. The next morning Claude starts sourcing contacts, enriching emails, writing content, and Slacking you the staged batch.
+7. **You are done.** Claude will confirm everything is live. The next weekday morning, the Morning Driver will run automatically, Slacking you the staged batch.
+
+   Expect to see in Slack: `Apollo morning run — <date>. 20 contacts across 1 account(s) (target 20). Confirm enroll: enroll <account>`.
 
 ---
 
